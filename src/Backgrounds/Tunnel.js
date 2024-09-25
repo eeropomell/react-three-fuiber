@@ -44,8 +44,8 @@ function Scene() {
       pos_ += vec3(10.,0,0);
     }
     pos_ = position;
-    float displacementX = f(time*.2,uv)*smoothstep(.01,.2,1. - uv.y);
-    pos_ += vec3(displacementX,0,0)*4.;
+    float displacementX = g(time*.2,uv)*smoothstep(.001,.05,1. - uv.y);
+    pos_ += vec3(displacementX,0,0)*1.;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos_, 1.0);
   }
   `;
@@ -89,10 +89,8 @@ const fragmentShader = `
 
   useEffect(() => {
     console.log(gltf.cameras);
-    gltf.cameras[0].setFocalLength(22);
+    gltf.cameras[0].setFocalLength(16);
     set({ camera: gltf.cameras[0] });
-
- 
 
     const cylinder = gltf.scene.getObjectByName("Cylinder");
     // console.log("C",cylinder);
