@@ -176,8 +176,6 @@ const fragmentShader = `
     }
   })
 
-
-
   const matRef = useRef();
 
   return <primitive object={gltf.scene} ref={matRef} />

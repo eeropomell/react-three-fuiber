@@ -1,12 +1,15 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Tunnel from './Backgrounds/Tunnel';
 import Chip1 from './Backgrounds/Chip1';
 import { useState } from 'react';
 import Timer from './Overlays/Timer';
 import Credits from './Overlays/Credits';
+import Scene from './Scene';
 
 const App = () => {
+
+
 
 
   const [currentOverlay, setCurrentOverlay] = useState(null);
@@ -23,6 +26,9 @@ const App = () => {
 
   return (
     <Router>
+
+
+
       <div style={{ display: 'flex', height: '100vh' }}>
         <div
           style={{
@@ -97,6 +103,10 @@ const App = () => {
 
         <div style={{ flex: 1}}>
           <Routes>
+
+
+            <Route path="/scene/*" element={<Scene/>}/>
+
             <Route path="/tunnel" element={<Tunnel />} />
            
             <Route path="/" element={<div>Select a page</div>} />
