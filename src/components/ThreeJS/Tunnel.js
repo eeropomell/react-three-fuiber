@@ -8,11 +8,11 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { ShaderMaterial } from 'three';
 import * as THREE from "three";
 import { useRef } from 'react';
-import { GammaCorrectionEffect } from '../Three/GammaCorrection';
+import { GammaCorrectionEffect } from '../../Three/GammaCorrection';
 
 
 function Scene() {
-  const gltf = useLoader(GLTFLoader, '/tunnel5.glb')
+  const gltf = useLoader(GLTFLoader, '/cylinder.glb')
 
   const set = useThree(s => s.set);
 

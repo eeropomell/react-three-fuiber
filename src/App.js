@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import Tunnel from './Backgrounds/Tunnel';
+import Tunnel from './components/ThreeJS/Tunnel';
 import Chip1 from './Backgrounds/Chip1';
 import { useState } from 'react';
 import Timer from './Overlays/Timer';
@@ -104,7 +104,6 @@ const App = () => {
         <div style={{ flex: 1}}>
           <Routes>
 
-
             <Route path="/scene/*" element={<Scene/>}/>
 
             <Route path="/tunnel" element={<Tunnel />} />
@@ -113,7 +112,6 @@ const App = () => {
 
             <Route path="/chip1" element={<Chip1/>}/>
 
-       
             {/* Add more routes here as needed */}
           </Routes>
         </div>

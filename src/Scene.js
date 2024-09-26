@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useParams, useSearchParams } from 'react-router-dom';
-import Tunnel from './Backgrounds/Tunnel'; // Background component example
+import Tunnel from './components/ThreeJS/Tunnel'; // Background component example
 
 
 const Scene = () => {
