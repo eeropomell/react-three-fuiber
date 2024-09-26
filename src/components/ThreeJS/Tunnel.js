@@ -12,7 +12,7 @@ import { GammaCorrectionEffect } from '../../Three/GammaCorrection';
 
 
 function Scene() {
-  const gltf = useLoader(GLTFLoader, '/cylinder.glb')
+  const gltf = useLoader(GLTFLoader, '/assets/models/cylinder.glb')
 
   const set = useThree(s => s.set);
 
