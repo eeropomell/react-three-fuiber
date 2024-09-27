@@ -10,8 +10,6 @@ This repo contains the source code for the overlays and effects used in Testauss
      - `localhost:3000/scene?background=tunnel&foreground=timer&timerText='Stream Starts Soon!'&timerCountDown=100000`
      - `localhost:3000/scene?background=microchip&foreground=credits&creditsText='....'`
 
-- **Presets** are scenes that have pre-defined URLs, e.g **Interview1**, **Interview2, Credits1, Credits2, etc**
-
 - Three.js is used to create the special effects
 
 
