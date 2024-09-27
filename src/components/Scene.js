@@ -5,6 +5,8 @@ import UI from './UI/UI';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { useRef } from 'react';
+import TestausLiveLogo from './Overlays/TestausLiveLogo';
+import AudioVisualizer from './Overlays/AudioVisualizer';
 
 const Scene = () => {
   const { pathname } = useLocation();
@@ -60,6 +62,9 @@ navigator.clipboard.writeText(fullURL)
     copiedSearchParams.set("ui", showUI ? "true" : "false");
     copiedSearchParams.set("background", searchParams.get("background"));
 
+    // temporary, later we add differnet logo positions
+    copiedSearchParams.set("testausLiveLogo_top", 100);
+
     if (backgroundRef.current) {
       const backgroundParameters = backgroundRef.current.getParameters();
       console.log("BG PARAMETERS", backgroundParameters);
@@ -74,9 +79,6 @@ navigator.clipboard.writeText(fullURL)
     }
 
     return copiedSearchParams;
-
-
-
   }
 
   useEffect(() => {
@@ -130,6 +132,16 @@ navigator.clipboard.writeText(fullURL)
       {renderBackground()}
 
       {showUI ? <UI handleCopyURLtoClipboard={handleCopyURLtoClipboard} /> : null}
+
+  
+      <TestausLiveLogo searchParams={new URLSearchParams({"testausLiveLogo_top": "30", "testausLiveLogo_height": "40",
+        "testausLiveLogo_left": "20"
+      })}/>
+
+      <AudioVisualizer searchParams={new URLSearchParams({"audioViz_top": "900", "audioViz_height": "15",
+        "audioViz_left": "1650"
+      })}/>
+      
 
     </div>
   );

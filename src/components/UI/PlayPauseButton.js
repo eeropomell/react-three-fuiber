@@ -1,4 +1,4 @@
-// /src/components/overlays/PlayPauseButton.js
+// /src/Components/overlays/PlayPauseButton.js
 import React from 'react';
 import { usePause } from '../../Context/PauseContext';
 

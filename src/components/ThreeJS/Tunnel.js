@@ -113,8 +113,9 @@ function TunnelActual({ params }) {
     // 1 = vertical
     // 2 = both
     // 3 = none
+    // 4 = infinite left turn
     if (turnDirection == 0.0) {
-      pos_ += vec3(n5sin,0,0);
+      pos_ += vec3(smoothstep(.05,.3,1. - uv.y)*30.,0,0);
     } else if (turnDirection == 1.0) {
       pos_ += vec3(0,0,n5sin);
     } else if (turnDirection == 3.0) {
@@ -284,7 +285,7 @@ const Tunnel_ = ({ params }) => {
 
 
       <TunnelActual params={params} />
-
+      <OrbitControls></OrbitControls>
       <EffectComposer>
         <GammaCorrectionEffect />
         <Bloom
