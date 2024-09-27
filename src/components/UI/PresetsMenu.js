@@ -1,6 +1,6 @@
 // src/components/ParameterMenu.js
 import React, { useState } from 'react';
-import "../Styles/PresetsMenu.css"
+import "../../Styles/PresetsMenu.css"
 
 const PresetsMenu = ({ presets, setParams,marginTop=0 }) => {
  

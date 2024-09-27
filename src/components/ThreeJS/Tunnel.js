@@ -8,11 +8,11 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { ShaderMaterial } from 'three';
 import * as THREE from "three";
 import { useRef } from 'react';
-import { GammaCorrectionEffect } from '../../Three/GammaCorrection';
+import { GammaCorrectionEffect } from './GammaCorrection';
 import { usePause } from '../../Context/PauseContext';
 import { useState } from 'react';
-import ParameterMenu from '../ParameterMenu';
-import PresetsMenu from '../PresetsMenu';
+import ParameterMenu from '../UI/ParameterMenu';
+import PresetsMenu from '../UI/PresetsMenu';
 
 const degreesToRadians = degrees => degrees * (Math.PI / 180);
 

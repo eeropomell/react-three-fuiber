@@ -1,7 +1,7 @@
 // Facecam.js
 import React from 'react';
-import '../Styles/Facecam.css'; // Importing CSS module for styling
-import { calculateHeightFromWidth } from '../Utils/viewportUtils';
+import '../../Styles/Facecam.css'; // Importing CSS module for styling
+import { calculateHeightFromWidth } from '../../Utils/viewportUtils';
 
 const Facecam = ({ type, width, height, borderColor, top, left, right, bottom }) => {
 

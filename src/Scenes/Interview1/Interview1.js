@@ -1,7 +1,7 @@
 // src/scenes/Interview1/Interview1.js
 import React from 'react';
 import './Interview1.css'; // Import scene-specific styles
-import Facecam from '../../Overlays/Facecam';
+import Facecam from '../../components/Overlays/Facecam';
 
 
 const Interview1 = () => {

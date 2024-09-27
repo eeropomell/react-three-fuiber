@@ -1,13 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import Tunnel from '../ThreeJS/Tunnel';
-import Chip1 from '../Backgrounds/Chip1';
 import { useState } from 'react';
-import Timer from '../../Overlays/Timer';
-import Credits from '../../Overlays/Credits';
+import Timer from '../Overlays/Timer';
+import Credits from '../Overlays/Credits';
 import Scene from '../Scene';
-import Facecam from '../../Overlays/Facecam';
-import "./App.css";
+import Facecam from '../Overlays/Facecam';
+import "../../App.css";
 import Interview1 from '../../Scenes/Interview1/Interview1';
 import { PauseProvider } from '../../Context/PauseContext';
 import PlayPauseButton from './PlayPauseButton';

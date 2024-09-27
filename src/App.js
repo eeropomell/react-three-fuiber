@@ -1,18 +1,17 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import Tunnel from './Components/ThreeJS/Tunnel';
-import Chip1 from './Backgrounds/Chip1';
+import Tunnel from './components/ThreeJS/Tunnel';
 import { useState } from 'react';
-import Timer from './Overlays/Timer';
-import Credits from './Overlays/Credits';
-import Scene from './Components/Scene';
-import Facecam from './Overlays/Facecam';
+import Timer from './components/Overlays/Timer';
+import Credits from './components/Overlays/Credits';
+import Scene from './components/Scene';
+import Facecam from './components/Overlays/Facecam';
 import "./App.css";
 import Interview1 from './Scenes/Interview1/Interview1';
 import { PauseProvider } from './Context/PauseContext';
-import PlayPauseButton from './Components/UI/PlayPauseButton';
 import { useEffect } from 'react';
 import { useRef } from 'react';
+import PlayPauseButton from './components/UI/PlayPauseButton';
 
 
 const ModifyUrlOnOpen = () => {
