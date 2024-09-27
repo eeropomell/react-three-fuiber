@@ -1,21 +1,68 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import Tunnel from './components/ThreeJS/Tunnel';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import Tunnel from './Components/ThreeJS/Tunnel';
 import Chip1 from './Backgrounds/Chip1';
 import { useState } from 'react';
 import Timer from './Overlays/Timer';
 import Credits from './Overlays/Credits';
-import Scene from './Scene';
+import Scene from './Components/Scene';
+import Facecam from './Overlays/Facecam';
+import "./App.css";
+import Interview1 from './Scenes/Interview1/Interview1';
+import { PauseProvider } from './Context/PauseContext';
+import PlayPauseButton from './Components/UI/PlayPauseButton';
+import { useEffect } from 'react';
+import { useRef } from 'react';
+
+
+const ModifyUrlOnOpen = () => {
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    navigate("/scene?background=tunnel&ui=true")
+  }, [])
+
+  return (
+    <></>
+  )
+
+}
 
 const App = () => {
 
+  const [width,setWidth] = useState(0);
+  const [height,setHeight] = useState(0);
 
+  useEffect(() => {
+    setWidth(window.innerWidth);
+    setHeight(window.innerHeight);
+  }, [window.innerHeight, window.innerWidth])
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'W' || event.key === 'w') {
+        // Your code here
+        setWidth(window.innerWidth);
+        setHeight(window.innerHeight);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  },[]);
 
   const [currentOverlay, setCurrentOverlay] = useState(null);
+  const [currentScene, setCurrentScene] = useState(null);
+  const [currentBackground] = useState("tunnel");
 
     // Function to show Timer overlay
     const showTimer = () => setCurrentOverlay(s => s == 'timer' ? null : "timer");
+
+
 
     // Function to show Credits overlay
     const showCredits = () => setCurrentOverlay(
@@ -24,99 +71,50 @@ const App = () => {
     // Function to hide overlay
     const hideOverlay = () => setCurrentOverlay(null);
 
+    const childRef = useRef(null);
+
+    const handleCopyUrlButton = () => {
+      if (childRef.current) {
+        const childData = childRef.current.getParametricURL();
+      }
+    }
+
+    const handleClick = () => {
+     
+    }
+
   return (
+    <PauseProvider>
     <Router>
 
 
-
+ 
       <div style={{ display: 'flex', height: '100vh' }}>
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            backgroundColor: 'rgba(128, 128, 128, 0.5)',
-            padding: '10px',
-            borderRadius: '5px',
-            zIndex: 1
-          }}
-        >
-          <div style={{color: "red"}}>Overlays</div>
+
+
+
      
-            
-            <button style={{ backgroundColor: 'lightgrey' }}
-            onClick={showTimer}>Timer</button>
-         
 
-    
-            
-            <button style={{ backgroundColor: 'lightgrey' }}
-            onClick={showCredits}>Credits</button>
-        
-         
-          {/* Add more links here as needed */}
-        </div>
-
-        <div
-          style={{
-            position: 'absolute',
-            top: 140,
-            left: 0,
-            backgroundColor: 'rgba(128, 128, 128, 0.5)',
-            padding: '10px',
-            borderRadius: '5px',
-            zIndex: 1
-          }}
-        >
-          <div style={{color: "red"}}>Backgrounds</div>
-          <Link
-            to="/tunnel"
-            style={{ display: 'block', marginBottom: '5px', textDecoration: 'none' }}
-          >
-
-            
-            <button style={{ backgroundColor: 'lightgrey' }}>Tunnel</button>
-          </Link>
-
-          <Link
-            to="/chip1"
-            style={{ display: 'block', marginBottom: '5px', textDecoration: 'none' }}
-          >
-
-            
-            <button style={{ backgroundColor: 'lightgrey' }}>Chip1</button>
-          </Link>
-          <Link
-            to="/other"
-            style={{ display: 'block', marginBottom: '5px', textDecoration: 'none' }}
-          >
-            <button style={{ backgroundColor: 'lightgrey' }}>Other</button>
-          </Link>
-          {/* Add more links here as needed */}
-        </div>
-
-
-        <div style={{ flex: 1 }}>
-        {currentOverlay === 'timer' && <Timer />}
-        {currentOverlay === 'credits' && <Credits />}
-      </div>
+      
 
         <div style={{ flex: 1}}>
           <Routes>
 
+         
+            <Route path="/" element={<ModifyUrlOnOpen/>}/>
             <Route path="/scene/*" element={<Scene/>}/>
-
-            <Route path="/tunnel" element={<Tunnel />} />
-           
-            <Route path="/" element={<div>Select a page</div>} />
-
-            <Route path="/chip1" element={<Chip1/>}/>
 
             {/* Add more routes here as needed */}
           </Routes>
         </div>
+
+
+
+
       </div>
+     
     </Router>
+    </PauseProvider>
   );
 };
 

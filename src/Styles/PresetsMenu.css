@@ -1,0 +1,19 @@
+
+
+
+.preset-menu-container {
+    position: absolute;
+    color: yellow;
+    background-color: rgba(24, 24, 23, 0.521);
+    padding: '10px';
+    border-radius: '5px';
+    z-index: 40;
+    margin-top: 100px;
+    margin-left: 90vw;
+}
+
+.preset-menu-container button {
+    width: 100px;
+    height: 40px;
+    margin: 10px;
+}

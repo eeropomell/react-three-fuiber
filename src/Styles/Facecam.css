@@ -1,0 +1,32 @@
+/* Facecam.css */
+
+.facecam {
+    border: 5px solid;
+    /* Default border style */
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 1);
+    /* Semi-transparent background */
+    position: absolute;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.facecam.default {
+    /* Default facecam styles */
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.facecam.circular {
+    /* Circular facecam styles */
+    border-radius: 50%;
+}
+
+.facecam.rounded {
+    /* Rounded facecam styles */
+    border-radius: 15px;
+}
+
+.facecam.square {
+    /* Square facecam styles */
+    border-radius: 0;
+}
