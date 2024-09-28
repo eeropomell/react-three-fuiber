@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import "../../Styles/Timer.css";
 
 const Timer = () => {
   // Set up initial countdown time (e.g., 10 minutes for the demo)
@@ -20,35 +21,13 @@ const Timer = () => {
   const seconds = timeLeft % 60;
 
   return (
-    <div style={styles.overlay}>
-      <div style={styles.text}>Stream starting soon</div>
-      <div style={styles.timer}>
+    <div className='timer-container'>
+         <div>
         {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
       </div>
     </div>
   );
 };
 
-const styles = {
-  overlay: {
-    position: 'fixed',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    textAlign: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    color: 'white',
-    padding: '20px',
-    borderRadius: '10px',
-    zIndex: 1000,
-  },
-  text: {
-    fontSize: '24px',
-    marginBottom: '10px',
-  },
-  timer: {
-    fontSize: '48px',
-  },
-};
 
 export default Timer;

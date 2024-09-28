@@ -1,0 +1,39 @@
+
+.timer-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 57px 81px;
+    gap: 10px;
+    
+    position: absolute;
+    width: 700px;
+    height: 228px;
+    left: 500px;
+    top: 340px;
+    
+    background: rgba(0, 0, 0, 0.85);
+    border-radius: 22px;
+  }
+  
+  .timer-container > div {
+    width: 825px;
+    height: 114px;
+    
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 140px;
+    line-height: 114px;
+    /* identical to box height */
+
+    text-align: center;
+    
+    background: linear-gradient(95.61deg, #8BBAFF -8.65%, #6CE5FF 45.52%, rgba(120, 255, 231, 0.96) 96.41%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+  }
+  

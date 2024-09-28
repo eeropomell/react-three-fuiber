@@ -7,12 +7,15 @@ import { useState } from 'react';
 import { useRef } from 'react';
 import TestausLiveLogo from './Overlays/TestausLiveLogo';
 import AudioVisualizer from './Overlays/AudioVisualizer';
+import Timer from './Overlays/Timer';
 
 const Scene = () => {
   const { pathname } = useLocation();
   const { '*': query } = useParams(); // Catch-all route parameter
   const [searchParams, setSearchParams] = useSearchParams();
   console.log(searchParams);
+
+  const [timerVisible,setTimerVisible] = useState(false);
 
   const backgroundRef = useRef();
 
@@ -122,18 +125,22 @@ navigator.clipboard.writeText(fullURL)
         return <Tunnel showUI={showUI} ref={backgroundRef} searchParams={searchParams}/>;
       // Add cases for other backgrounds if needed
       default:
-        return <div>No background specified</div>;
+        return <div>TODO, explore tunnel background for now</div>;
     }
   };
 
+  const handleTimerClick = () => {
+    setTimerVisible(s => !s);
+  } 
 
   return (
     <div>
       {renderBackground()}
 
-      {showUI ? <UI handleCopyURLtoClipboard={handleCopyURLtoClipboard} /> : null}
+      {showUI ? <UI handleCopyURLtoClipboard={handleCopyURLtoClipboard} handleTimerClick={handleTimerClick}/> : null}
 
-  
+      {timerVisible ? <Timer/> : null}
+
       <TestausLiveLogo searchParams={new URLSearchParams({"testausLiveLogo_top": "30", "testausLiveLogo_height": "40",
         "testausLiveLogo_left": "20"
       })}/>

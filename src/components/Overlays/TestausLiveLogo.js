@@ -1,5 +1,7 @@
 import React from 'react';
 import { useEffect } from 'react';
+import "../../App.css";
+
 
 const TestausLiveLogo = ({searchParams}) => {
 
@@ -12,12 +14,14 @@ const TestausLiveLogo = ({searchParams}) => {
     }, [])
 
   return (
+    <>
     <div style={{
         position: "absolute",
         top: top, left,
     }}>
       <img src="/testausLiveLogo.png" height={height}/>
     </div>
+    </>
   );
 };
 

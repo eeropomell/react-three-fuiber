@@ -16,12 +16,13 @@ import { useSearchParams } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 
 
-const UI = ({handleCopyURLtoClipboard}) => {
+const UI = ({handleCopyURLtoClipboard,handleTimerClick}) => {
 
     const { pathname } = useLocation();
     const { '*': query } = useParams(); // Catch-all route parameter
     const [searchParams,setSearchParams] = useSearchParams();
     console.log(searchParams);
+
 
     const navigate = useNavigate();
 
@@ -64,11 +65,35 @@ const UI = ({handleCopyURLtoClipboard}) => {
              onClick={() => handleClick("chip1")}>Chip1</button>
      
    
-            <button style={{ backgroundColor: 'lightgrey' }}>Other</button>
+            <button style={{ backgroundColor: 'lightgrey' }} onClick={() => handleClick("chip2")}>Chip2</button>
        
           {/* Add more links here as needed */}
         </div>
 
+        <div
+          style={{
+            position: 'absolute',
+            top: 260,
+            left: 0,
+            backgroundColor: 'rgba(128, 128, 128, 0.5)',
+            padding: '10px',
+            borderRadius: '5px',
+            zIndex: 1
+          }}
+        >
+          <div style={{color: "red"}}>Overlays</div>
+        
+            
+            <button style={{ backgroundColor: 'lightgrey' }} 
+            onClick={handleTimerClick}>Timer1</button>
+      
+ 
+
+   
+  
+       
+          {/* Add more links here as needed */}
+        </div>
 
             <div
           style={{
