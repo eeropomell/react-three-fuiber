@@ -286,7 +286,7 @@ const Tunnel_ = ({ params }) => {
 
 
       <TunnelActual params={params} />
-      <OrbitControls></OrbitControls>
+    
       <EffectComposer>
         <GammaCorrectionEffect />
         <Bloom
