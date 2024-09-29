@@ -14,6 +14,7 @@ import { useEffect } from 'react';
 import { useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
+import FPSCounter from './FPSCounter';
 
 
 const UI = ({handleCopyURLtoClipboard,handleTimerClick}) => {

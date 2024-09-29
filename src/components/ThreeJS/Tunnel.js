@@ -13,6 +13,10 @@ import { usePause } from '../../Context/PauseContext';
 import { useState } from 'react';
 import ParameterMenu from '../UI/ParameterMenu';
 import PresetsMenu from '../UI/PresetsMenu';
+import FPSCounter from '../UI/FPSCounter';
+
+
+
 
 const degreesToRadians = degrees => degrees * (Math.PI / 180);
 
@@ -46,7 +50,7 @@ const CameraLogger = () => {
   return null;
 };
 
-function TunnelActual({ params }) {
+function TunnelActual({ params, sceneTime, setSceneTime }) {
   const gltf = useLoader(GLTFLoader, '/assets/models/tunnel6.glb')
 
   const set = useThree(s => s.set);
@@ -137,12 +141,12 @@ function TunnelActual({ params }) {
   uniform float time;
   uniform float delta;
 
-  uniform float gridScrollSpeed;
+  uniform float gridScroll;
   uniform float gridScale;
 
   void main() {
-      float scrollSpeed = gridScrollSpeed;
-      vec2 uv = vUv + vec2(0.0,time*scrollSpeed);
+      float scrollSpeed = gridScroll;
+      vec2 uv = vUv + vec2(0.0,gridScroll);
       // Time varying pixel color
       float scale = gridScale;
       
@@ -248,20 +252,126 @@ function TunnelActual({ params }) {
   }, [gltf.scene, set, customShaderMaterial])
 
 
+  const {time,setTime,timeResetFlag,setTimeResetFlag} = usePause();
+  
 
   useFrame((state, delta) => {
     // console.log(customShaderMaterial.uniforms.iTime);
-    if (!isPaused) {
-      customShaderMaterial.uniforms.time.value = state.clock.getElapsedTime();
+    console.log("my sceneTime", sceneTime);
+
+    if (!isPaused && !timeResetFlag) {
+      customShaderMaterial.uniforms.time.value = time;
+      setTime(t => t + delta);
+    } else if (timeResetFlag) {
+      setTime(0);
+      setTimeResetFlag(false);
     }
 
-    customShaderMaterial.uniforms.turnSpeed.value = params.turnSpeed.value;
-    customShaderMaterial.uniforms.turnFrequency.value = params.turnFrequency.value;
-    customShaderMaterial.uniforms.turnMagnitude.value = params.turnMagnitude.value;
-    customShaderMaterial.uniforms.gridScale.value = params.gridScale.value;
-    customShaderMaterial.uniforms.gridScrollSpeed.value = params.gridScrollSpeed.value;
-    customShaderMaterial.uniforms.turnDirection.value = params.turnDirection.value;
 
+    // 4+4*smoothstep(0,0.7,sin(x+t))
+
+ 
+    const val = .1 * THREE.MathUtils.smoothstep(Math.sin(time * 2), 0, 1);
+    // THREE.MathUtils.lerp(0,.001,time);
+    // params.gridScroll.value;
+    console.log("Val", val, Math.sin(time), time);
+
+    /*
+
+    gridScale = sin(t*2)
+    gridScale = 4 + 4*smoothstep(0,0.7,sin(t))
+
+    */
+
+    function replaceSinWithMathSin(input) {
+      return input.replace(/sin\(([^)]+)\)/g, 'Math.sin($1)');
+    }
+
+    function formatMathExpr(input) {
+      try {
+        let t1 = input.replace(/sin\(([^)]+)\)/g, 'Math.sin($1)');
+        t1 = t1.replace(/cos\(([^)]+)\)/g, 'Math.cos($1)')
+        t1 = t1.replace(/tan\(([^)]+)\)/g, 'Math.tan($1)')
+        t1 = t1.replace(/random\(([^)]+)\)/g, 'Math.random($1)')
+      } catch (e) {
+        console.error(e);
+      }
+
+    }
+
+    const fnExpr = `
+  
+    return ${params.gridScale.value};
+    `;
+
+
+
+
+    const step = (x, limit) => {
+      return x < limit ? 0 : 1;
+    };
+
+
+
+    customShaderMaterial.uniforms.turnSpeed.value = params.turnSpeed.value;
+    try {
+      customShaderMaterial.uniforms.turnSpeed.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
+      ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnSpeed.value}`)(time, time, 
+        ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
+        ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
+        step
+      );
+    } catch (e) {
+      
+    }
+
+    try {
+      customShaderMaterial.uniforms.turnFrequency.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
+      ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnFrequency.value}`)(time, time, 
+        ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
+        ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
+        step
+      );
+    } catch (e) {
+      
+    }
+    try {
+      customShaderMaterial.uniforms.turnMagnitude.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
+      ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnMagnitude.value}`)(time, time, 
+        ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
+        ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
+        step
+      );
+    } catch (e) {
+
+    }
+
+  
+    try {
+      customShaderMaterial.uniforms.gridScale.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
+      ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.gridScale.value}`)(time, time, 
+        ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
+        ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
+        step
+      );
+    } catch (e) {
+      customShaderMaterial.uniforms.gridScale.value = 10;
+    }
+
+    try {
+      customShaderMaterial.uniforms.gridScroll.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
+      ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.gridScroll.value}`)(time, time, 
+        ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
+        ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
+        step
+      );
+    } catch (e) {
+      customShaderMaterial.uniforms.gridScroll.value = -.2;
+    }
+
+
+
+    customShaderMaterial.uniforms.turnDirection.value = params.turnDirection.value;
     customShaderMaterial.uniforms.delta.value = delta;
 
 
@@ -277,7 +387,10 @@ function TunnelActual({ params }) {
   return <primitive object={gltf.scene} ref={matRef} />
 }
 
-const Tunnel_ = ({ params }) => {
+const Tunnel_ = ({ params,setSceneTime,sceneTime,showUI }) => {
+
+
+
   return (
     <Canvas style={{
       backgroundColor: "#162E5D",
@@ -285,8 +398,10 @@ const Tunnel_ = ({ params }) => {
     }}>
 
 
-      <TunnelActual params={params} />
-    
+      <TunnelActual params={params} setSceneTime={setSceneTime} sceneTime={sceneTime}/>
+
+      {showUI ? <FPSCounter/> : null}
+
       <EffectComposer>
         <GammaCorrectionEffect />
         <Bloom
@@ -304,10 +419,10 @@ const Tunnel_ = ({ params }) => {
   )
 }
 
-const Tunnel = forwardRef((props,ref) => {
+const Tunnel = forwardRef((props, ref) => {
 
 
- 
+  
   const showUI = props.showUI;
   const searchParams = props.searchParams;
 
@@ -337,7 +452,7 @@ const Tunnel = forwardRef((props,ref) => {
       value: 25
     },
 
-    "gridScrollSpeed": {
+    "gridScroll": {
       value: -.25
     },
 
@@ -350,17 +465,17 @@ const Tunnel = forwardRef((props,ref) => {
   useEffect(() => {
     // Initialize a new object to store the updated params
     const updatedParams = { ...params };
-  
+
     // Iterate over each key in the `params` state
     for (const key in updatedParams) {
       if (updatedParams.hasOwnProperty(key)) {
         // Check if the searchParams contains the key
         const searchParamValue = searchParams.get(key);
-  
+
         if (searchParamValue !== null) {
           // Parse the value to a number (assuming all values are numbers; adjust if needed)
           const parsedValue = parseFloat(searchParamValue);
-  
+
           // Update the params with the parsed value
           updatedParams[key] = {
             ...updatedParams[key],
@@ -369,12 +484,12 @@ const Tunnel = forwardRef((props,ref) => {
         }
       }
     }
-  
+
     // Update the state with the new params
     setParams(updatedParams);
-  
+
   }, [searchParams]); // Dependency array includes `searchParams` to run the effect when it changes
-  
+
 
   const presets = {
     "Slow Straight": {
@@ -382,7 +497,7 @@ const Tunnel = forwardRef((props,ref) => {
       turnFrequency: 2,
       turnDirection: 0,
       gridScale: 10,
-      gridScrollSpeed: -.1,
+      gridScroll: -.1,
       turnSpeed: 2
     },
     "Forward Travel": {
@@ -390,23 +505,15 @@ const Tunnel = forwardRef((props,ref) => {
       turnFrequency: 3,
       turnDirection: 0,
       gridScale: 25,
-      gridScrollSpeed: -.25,
+      gridScroll: -.25,
       turnSpeed: 3
-    },
-    "Slow Backwards": {
-      turnMagnitude: 35,
-      turnFrequency: -2,
-      turnDirection: 0,
-      gridScale: 70,
-      gridScrollSpeed: .05,
-      turnSpeed: 1
     },
     "Slow Spiral": {
       turnMagnitude: 7,
       turnFrequency: -3,
       turnDirection: 2,
       gridScale: 25,
-      gridScrollSpeed: -.02,
+      gridScroll: -.02,
       turnSpeed: .5
     },
     "170BPM Forward Travel": {
@@ -414,17 +521,9 @@ const Tunnel = forwardRef((props,ref) => {
       turnFrequency: 3,
       turnDirection: 0,
       gridScale: 25,
-      gridScrollSpeed: -1.02,
+      gridScroll: -1.02,
       turnSpeed: 8
     },
-    "INSANE": {
-      turnMagnitude: 1000000000000000,
-      turnFrequency: 0,
-      turnDirection: 2,
-      gridScale: 20,
-      gridScrollSpeed: 1,
-      turnSpeed: .1
-    }
   };
 
   const applyPresetToParams = (presetKey) => {
@@ -450,19 +549,23 @@ const Tunnel = forwardRef((props,ref) => {
     });
   }
 
+  const [sceneTime,setSceneTime] = useState(1);
+
 
   return (
     <>
-    
-    {showUI ? <>
-      <ParameterMenu params={params} setParams={setParams} />
 
-<PresetsMenu presets={presets} setParams={setParams} marginTop={500} />
-    </>: null}
+      {showUI ? <>
+        <ParameterMenu params={params} setParams={setParams} sceneTime={sceneTime} setSceneTime={setSceneTime}/>
+
+        <PresetsMenu presets={presets} setParams={setParams} marginTop={600} />
+
+     
+      </> : null}
 
 
 
-      <Tunnel_ params={params} />
+      <Tunnel_ params={params} setSceneTime={setSceneTime} sceneTime={sceneTime} showUI={showUI}/>
 
 
 
