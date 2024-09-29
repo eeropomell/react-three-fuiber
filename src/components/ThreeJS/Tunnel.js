@@ -453,7 +453,7 @@ const Tunnel = forwardRef((props, ref) => {
     },
 
     "gridScroll": {
-      value: -.25
+      value: "-0.25*t"
     },
 
     "turnSpeed": {
@@ -497,7 +497,7 @@ const Tunnel = forwardRef((props, ref) => {
       turnFrequency: 2,
       turnDirection: 0,
       gridScale: 10,
-      gridScroll: -.1,
+      gridScroll: "-.1*t",
       turnSpeed: 2
     },
     "Forward Travel": {
@@ -505,7 +505,7 @@ const Tunnel = forwardRef((props, ref) => {
       turnFrequency: 3,
       turnDirection: 0,
       gridScale: 25,
-      gridScroll: -.25,
+      gridScroll: "-.25*t",
       turnSpeed: 3
     },
     "Slow Spiral": {
@@ -513,7 +513,7 @@ const Tunnel = forwardRef((props, ref) => {
       turnFrequency: -3,
       turnDirection: 2,
       gridScale: 25,
-      gridScroll: -.02,
+      gridScroll: "-.02*t",
       turnSpeed: .5
     },
     "170BPM Forward Travel": {
@@ -521,7 +521,7 @@ const Tunnel = forwardRef((props, ref) => {
       turnFrequency: 3,
       turnDirection: 0,
       gridScale: 25,
-      gridScroll: -1.02,
+      gridScroll: "-1.02*t",
       turnSpeed: 8
     },
   };
