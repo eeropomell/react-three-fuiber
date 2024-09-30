@@ -12,6 +12,7 @@ import { PauseProvider } from './Context/PauseContext';
 import { useEffect } from 'react';
 import { useRef } from 'react';
 import PlayPauseButton from './components/UI/PlayPauseButton';
+import AudioPlayer from './components/AudioPlayer';
 
 
 const ModifyUrlOnOpen = () => {
@@ -93,7 +94,7 @@ const App = () => {
 
 
      
-
+    <AudioPlayer/>
       
 
         <div style={{ flex: 1}}>

@@ -402,6 +402,8 @@ const Tunnel_ = ({ params,setSceneTime,sceneTime,showUI }) => {
 
       {showUI ? <FPSCounter/> : null}
 
+      <OrbitControls></OrbitControls>
+
       <EffectComposer>
         <GammaCorrectionEffect />
         <Bloom
