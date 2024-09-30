@@ -13,7 +13,6 @@ const Facecam = ({ type, width, height, borderColor, top, left, right, bottom })
   const facecamHeight = height || calculateHeightFromWidth(16,9,width || defaultWidth);
   const facecamBorderColor = borderColor || '#000000';
 
-  
 
   // Determine the className based on the type of facecam
   const facecamClass = `facecam ${facecamType}`;

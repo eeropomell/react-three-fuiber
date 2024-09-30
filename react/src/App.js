@@ -7,12 +7,14 @@ import Credits from './components/Overlays/Credits';
 import Scene from './components/Scene';
 import Facecam from './components/Overlays/Facecam';
 import "./App.css";
-import Interview1 from './Scenes/Interview1/Interview1';
 import { PauseProvider } from './Context/PauseContext';
 import { useEffect } from 'react';
 import { useRef } from 'react';
 import PlayPauseButton from './components/UI/PlayPauseButton';
 import AudioPlayer from './components/AudioPlayer';
+import Opener from './components/Overlays/Opener';
+import Interview from './components/Overlays/Interview';
+import ShowProject from './components/Overlays/ShowProject';
 
 
 const ModifyUrlOnOpen = () => {
@@ -89,20 +91,27 @@ const App = () => {
 
 
  
-      <div style={{ display: 'flex', height: '100vh' }}>
+      <div >
 
 
 
      
-    <AudioPlayer/>
+   
       
 
-        <div style={{ flex: 1}}>
+        <div>
           <Routes>
 
          
             <Route path="/" element={<ModifyUrlOnOpen/>}/>
             <Route path="/scene/*" element={<Scene/>}/>
+
+            <Route path="/overlay/timer" element={<Timer/>}/>
+            <Route path="/overlay/opener" element={<Opener/>}/>
+
+            <Route path="/overlay/interview" element={<Interview/>}/>
+
+            <Route path="/overlay/showproject" element={<ShowProject/>}/>
 
             {/* Add more routes here as needed */}
           </Routes>

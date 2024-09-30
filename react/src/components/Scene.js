@@ -141,11 +141,11 @@ navigator.clipboard.writeText(fullURL)
 
       {timerVisible ? <Timer/> : null}
 
-      <TestausLiveLogo searchParams={new URLSearchParams({"testausLiveLogo_top": "30", "testausLiveLogo_height": "40",
+      <TestausLiveLogo searchParams={new URLSearchParams({"testausLiveLogo_top": "30", "testausLiveLogo_height": "100",
         "testausLiveLogo_left": "20"
       })}/>
 
-      <AudioVisualizer searchParams={new URLSearchParams({"audioViz_top": "900", "audioViz_height": "15",
+      <AudioVisualizer searchParams={new URLSearchParams({"audioViz_top": "1020", "audioViz_height": "16",
         "audioViz_left": "1650"
       })}/>
       

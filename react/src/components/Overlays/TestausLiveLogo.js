@@ -19,7 +19,7 @@ const TestausLiveLogo = ({searchParams}) => {
         position: "absolute",
         top: top, left,
     }}>
-      <img src="/testausLiveLogo.png" height={height}/>
+      <img src="/assets/images/testausLiveLogo.png" height={height}/>
     </div>
     </>
   );

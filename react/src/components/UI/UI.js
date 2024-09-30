@@ -7,7 +7,6 @@ import Credits from '../Overlays/Credits';
 import Scene from '../Scene';
 import Facecam from '../Overlays/Facecam';
 import "../../App.css";
-import Interview1 from '../../Scenes/Interview1/Interview1';
 import { PauseProvider } from '../../Context/PauseContext';
 import PlayPauseButton from './PlayPauseButton';
 import { useEffect } from 'react';
