@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import "../../Styles/Timer.css";
 
-const Opener = () => {
+const OpeningScreen = () => {
  
   
 
@@ -13,4 +13,4 @@ const Opener = () => {
 };
 
 
-export default Opener;
+export default OpeningScreen;

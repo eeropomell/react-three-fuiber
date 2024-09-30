@@ -12,9 +12,11 @@ import { useEffect } from 'react';
 import { useRef } from 'react';
 import PlayPauseButton from './components/UI/PlayPauseButton';
 import AudioPlayer from './components/AudioPlayer';
-import Opener from './components/Overlays/Opener';
 import Interview from './components/Overlays/Interview';
 import ShowProject from './components/Overlays/ShowProject';
+import OpeningScreen from './components/Overlays/OpeningScreen';
+import EndingScreen from './components/Overlays/EndingScreen';
+import Schedule from './components/Overlays/Schedule';
 
 
 const ModifyUrlOnOpen = () => {
@@ -95,7 +97,7 @@ const App = () => {
 
 
 
-     
+
    
       
 
@@ -107,11 +109,17 @@ const App = () => {
             <Route path="/scene/*" element={<Scene/>}/>
 
             <Route path="/overlay/timer" element={<Timer/>}/>
-            <Route path="/overlay/opener" element={<Opener/>}/>
+
+            <Route path="/overlay/schedule" element={<Schedule/>}/>
 
             <Route path="/overlay/interview" element={<Interview/>}/>
 
             <Route path="/overlay/showproject" element={<ShowProject/>}/>
+
+            <Route path="/overlay/openingscreen" element={<OpeningScreen/>}/>
+            <Route path="/overlay/endingscreen" element={<EndingScreen/>}/>
+
+         
 
             {/* Add more routes here as needed */}
           </Routes>
