@@ -1,5 +1,6 @@
 const OBSWebSocket = require('obs-websocket-js').default;
 const { createInterface } = require("readline")
+const WebSocket = require('ws'); // Add WebSocket library
 
 const rl = createInterface({
     input: process.stdin,
@@ -8,6 +9,40 @@ const rl = createInterface({
 rl.setPrompt("> ")
 
 let socket = null
+
+const wss = new WebSocket.Server({port: 4000});
+
+// 1 = forward
+// -1 = backward
+let gridScrollDirection = 1;
+
+const clients = [];
+
+// Event listener for new connections
+wss.on('connection', (ws) => {
+    console.log('New client connected');
+    
+    // Add the new client to the array
+    clients.push(ws);
+  
+    // Handle incoming messages from clients
+    ws.on('message', (message) => {
+      console.log(`Received: ${message}`);
+      
+      // Echo the received message back to the client
+      ws.send(`Server received: ${message}`);
+    });
+  
+    // Handle client disconnection
+    ws.on('close', () => {
+      console.log('Client disconnected');
+  
+      // Remove the client from the array when they disconnect
+      clients.splice(clients.indexOf(ws), 1);
+    });
+});
+
+
 
 // OBS commands
 async function OBS(line) {
@@ -44,27 +79,36 @@ async function OBS(line) {
             return true
         }
         case "setScene": {
-       
 
-              // add 
-   
-        const currentSettings = await socket.call("GetInputSettings", {
-            inputName: "Browser-3"
-        })
-        console.log("settings",currentSettings);
-        const url = new URL(currentSettings.inputSettings.url)
-     //   url.searchParams.set("gridScale",32);
-        console.log('u',url);
+            const scenes = await socket.call("GetSceneList")
+            if (!scenes.scenes.map((obj) => obj.sceneName).includes(args[0])) {
+                console.log("Unknown scene.")
+                return true
+            }
+            await socket.call("SetCurrentProgramScene", {
+                sceneName: args[0]
+            })
 
+            
+/*   const arr = [{gridScroll: "-1*t"}, {gridScroll: "-.01*t"},
+            {gridScale: "30"}, {gridScale: "5"}, {gridScale: "sin(t*1)*4+5"}];
+            const randomIndex = Math.floor(Math.random() * arr.length);*/
+            
+            let message;
+            gridScrollDirection *= -1;
+            if (gridScrollDirection == -1) {
+                message = {gridScroll: "-0.1*t", "turnMagnitude": 5}
+            } else {
+                message = {gridScroll: "-0.03*t", "turnMagnitude": 0}
+            }
+            message = JSON.stringify(message);
 
-        await socket.call("PressInputPropertiesButton", {
-            inputName: "Browser-3",
-            propertyName: "refreshnocache"
-        })
-      //  await socket.call("SetCurrentProgramScene", {
-      //      sceneName: args[0]
-       // })
-
+            if (clients.length != 0) {
+                console.log("Sending {" + message + "}");
+                clients.forEach(ws => {
+                    ws.send(message);
+                })
+            }
 
             console.log(`Scene set to ${args[0]}`)
             return true
@@ -97,8 +141,6 @@ async function OBS(line) {
     socket = new OBSWebSocket()
     await socket.connect("ws://127.0.0.1:4455")
     console.log("Connected to OBS!")
-
-  
 
     rl.prompt()
 })()

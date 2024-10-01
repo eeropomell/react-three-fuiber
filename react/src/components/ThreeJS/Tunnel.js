@@ -14,6 +14,7 @@ import { useState } from 'react';
 import ParameterMenu from '../UI/ParameterMenu';
 import PresetsMenu from '../UI/PresetsMenu';
 import FPSCounter from '../UI/FPSCounter';
+import io from 'socket.io-client';
 
 
 
@@ -252,8 +253,8 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
   }, [gltf.scene, set, customShaderMaterial])
 
 
-  const {time,setTime,timeResetFlag,setTimeResetFlag} = usePause();
-  
+  const { time, setTime, timeResetFlag, setTimeResetFlag } = usePause();
+
 
   useFrame((state, delta) => {
     // console.log(customShaderMaterial.uniforms.iTime);
@@ -270,7 +271,7 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
 
     // 4+4*smoothstep(0,0.7,sin(x+t))
 
- 
+
     const val = .1 * THREE.MathUtils.smoothstep(Math.sin(time * 2), 0, 1);
     // THREE.MathUtils.lerp(0,.001,time);
     // params.gridScroll.value;
@@ -316,55 +317,55 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
     customShaderMaterial.uniforms.turnSpeed.value = params.turnSpeed.value;
     try {
       customShaderMaterial.uniforms.turnSpeed.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
-      ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnSpeed.value}`)(time, time, 
-        ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
-        ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
-        step
-      );
+        ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnSpeed.value}`)(time, time,
+          ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
+          ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
+          step
+        );
     } catch (e) {
-      
+
     }
 
     try {
       customShaderMaterial.uniforms.turnFrequency.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
-      ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnFrequency.value}`)(time, time, 
-        ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
-        ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
-        step
-      );
+        ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnFrequency.value}`)(time, time,
+          ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
+          ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
+          step
+        );
     } catch (e) {
-      
+
     }
     try {
       customShaderMaterial.uniforms.turnMagnitude.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
-      ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnMagnitude.value}`)(time, time, 
-        ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
-        ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
-        step
-      );
+        ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnMagnitude.value}`)(time, time,
+          ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
+          ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
+          step
+        );
     } catch (e) {
 
     }
 
-  
+
     try {
       customShaderMaterial.uniforms.gridScale.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
-      ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.gridScale.value}`)(time, time, 
-        ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
-        ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
-        step
-      );
+        ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.gridScale.value}`)(time, time,
+          ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
+          ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
+          step
+        );
     } catch (e) {
       customShaderMaterial.uniforms.gridScale.value = 10;
     }
 
     try {
       customShaderMaterial.uniforms.gridScroll.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
-      ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.gridScroll.value}`)(time, time, 
-        ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
-        ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
-        step
-      );
+        ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.gridScroll.value}`)(time, time,
+          ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
+          ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
+          step
+        );
     } catch (e) {
       customShaderMaterial.uniforms.gridScroll.value = -.2;
     }
@@ -387,7 +388,7 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
   return <primitive object={gltf.scene} ref={matRef} />
 }
 
-const Tunnel_ = ({ params,setSceneTime,sceneTime,showUI }) => {
+const Tunnel_ = ({ params, setSceneTime, sceneTime, showUI }) => {
 
 
 
@@ -398,11 +399,11 @@ const Tunnel_ = ({ params,setSceneTime,sceneTime,showUI }) => {
     }}>
 
 
-      <TunnelActual params={params} setSceneTime={setSceneTime} sceneTime={sceneTime}/>
+      <TunnelActual params={params} setSceneTime={setSceneTime} sceneTime={sceneTime} />
 
-      {showUI ? <FPSCounter/> : null}
+      {showUI ? <FPSCounter /> : null}
 
-      <OrbitControls></OrbitControls>
+
 
       <EffectComposer>
         <GammaCorrectionEffect />
@@ -424,7 +425,61 @@ const Tunnel_ = ({ params,setSceneTime,sceneTime,showUI }) => {
 const Tunnel = forwardRef((props, ref) => {
 
 
+
+  const [message, setMessage] = useState(''); // General message state
+
+  const [ws, setWs] = useState(null);
+
+  useEffect(() => {
+    // Create a WebSocket connection
+    const websocket = new WebSocket('ws://localhost:4000');
+
+    // Handle incoming messages
+    websocket.onmessage = (event) => {
+      console.log('Message from server:', event.data);
+
+      if (event.data == null) {
+        return;
+      }
+
+      const messageJSON = JSON.parse(event.data);
+
+      // Initialize a new object to store the updated params
+      const updatedParams = { ...params };
+
+      // Iterate over each key in the `params` state
+      for (const key in messageJSON) {
+        if (updatedParams.hasOwnProperty(key)) {
+          // Check if the searchParams contains the key
+
+          // Parse the value to a number (assuming all values are numbers; adjust if needed)
+          
+
+          // Update the params with the parsed value
+          updatedParams[key] = {
+            ...updatedParams[key],
+            value: messageJSON[key]
+          };
+
+        }
+      }
+
+      // Update the state with the new params
+      setParams(updatedParams);
+
+
+    };
   
+    // Set the WebSocket instance to state
+    setWs(websocket);
+
+    // Clean up the WebSocket connection on component unmount
+    return () => {
+      websocket.close();
+    };
+  }, []);
+
+
   const showUI = props.showUI;
   const searchParams = props.searchParams;
 
@@ -551,23 +606,23 @@ const Tunnel = forwardRef((props, ref) => {
     });
   }
 
-  const [sceneTime,setSceneTime] = useState(1);
+  const [sceneTime, setSceneTime] = useState(1);
 
 
   return (
     <>
 
       {showUI ? <>
-        <ParameterMenu params={params} setParams={setParams} sceneTime={sceneTime} setSceneTime={setSceneTime}/>
+        <ParameterMenu params={params} setParams={setParams} sceneTime={sceneTime} setSceneTime={setSceneTime} />
 
         <PresetsMenu presets={presets} setParams={setParams} marginTop={600} />
 
-     
+
       </> : null}
 
 
 
-      <Tunnel_ params={params} setSceneTime={setSceneTime} sceneTime={sceneTime} showUI={showUI}/>
+      <Tunnel_ params={params} setSceneTime={setSceneTime} sceneTime={sceneTime} showUI={showUI} />
 
 
 

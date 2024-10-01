@@ -49,9 +49,9 @@ const Schedule = () => {
                 display: "flex",
                 alignItems: "center"
             }}>
-                <div className="schedule-list" style={{
+                <div className="schedule-list tsry-text" style={{
                     position: "absolute", zIndex: 1000, color: "white",
-                    left: "55px"
+                    left: "55px",fontSize:"50px"
                 }}>
                     <div>
                          17:00 - AMA
