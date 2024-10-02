@@ -3,14 +3,15 @@
 
 This repo contains the source code for the overlays and effects used in Testausserveri ry's livestreams (Testauslive)
 
+Better README is coming
+
 ## Features / Plan
 
-- The parametric URL specifies what background and other elements to display, e.g:
-     - `localhost:3000/scene?background=tunnel&foreground=timer&timerText='Stream Starts Soon!'&timerCountDown=100000`
-     - `localhost:3000/scene?background=microchip&foreground=credits&creditsText='....'`
+- Host uses the script in `control/index.js` to control the stream, e.g change scenes or trigger the intro cinematic
 
-- Three.js is used to create the special effects
+- Overlays - e.g Timer, Facecam Containers - are made in CSS
 
+- Three.js is used to create the special effects in the background
 
 ## Development
 
