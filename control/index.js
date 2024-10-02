@@ -38,19 +38,22 @@ async function launchChromium(url) {
             width: 1920, height: 1080
         }, // Use full size
         args: [
-            "--kiosk", // full screen webpage view
-            '--disable-background-timer-throttling', 
-            '--disable-renderer-backgrounding', 
-            '--window-position=0,0', 
-            '--window-size=1920,1080', 
-          ]
+            "--disable-background-timer-throttling",
+            "--disable-background-networking-throttling",
+            "--disable-background-tab-freeze",
+            "--disable-background-tab-freezetimeout",
+            "--disable-backgrounding-occlude-windows",
+            "--disable-renderer-backgrounding",
+            "--window-position=1700,0",
+            "--window-size=1920,1080",
+            "--app=" + url,
+        ],
     });
-    page = await browser.newPage();
-    await page.goto(url); 
     console.log("Chromium launched with page: " + url);
-    return page;
+    return browser.pages().then((pages) => pages[pages.length - 1]);
 }
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Control commands
 async function Control(line) {
@@ -58,22 +61,28 @@ async function Control(line) {
     const args = line.split(" ").slice(1)
     switch (command) {
         case "launchOverlayWindows": {
-            timerPage = await launchChromium("http://localhost:3000/overlay/timer");
-            rl.setPrompt(">");
-            launchChromium("http://localhost:3000/overlay/schedule");
-            rl.setPrompt(">");
-            launchChromium("http://localhost:3000/overlay/showproject");
-            rl.setPrompt(">");
-            launchChromium("http://localhost:3000/overlay/interview");
-            rl.setPrompt(">");
-            launchChromium("http://localhost:3000/overlay/openingscreen");
-            rl.setPrompt(">");
-            launchChromium("http://localhost:3000/overlay/endingscreen");
-            rl.setPrompt(">");
-            launchChromium("http://localhost:3000/scene?background=tunnel");
-            rl.setPrompt(">");
+            if (args && args.length > 0) {
+                await launchChromium("http://localhost:3000/overlay/" + args[0])
+                await sleep(500);
+                rl.setPrompt(">");
+                return true;
+            }
+            timerPage = await launchChromium("http://localhost:3000/overlay/timer")
+            await sleep(500)
+            await launchChromium("http://localhost:3000/overlay/schedule")
+            await sleep(500)
+            await launchChromium("http://localhost:3000/overlay/showproject")
+            await sleep(500)
+            await launchChromium("http://localhost:3000/overlay/interview")
+            await sleep(500)
+            await launchChromium("http://localhost:3000/overlay/openingscreen")
+            await sleep(500)
+            await launchChromium("http://localhost:3000/overlay/endingscreen")
+            await sleep(500)
+            await launchChromium("http://localhost:3000/scene?background=tunnel")
+            rl.setPrompt(">")
+            return true
         }
-            return true;
         case "setTimer": {
 
             if (timerPage) {

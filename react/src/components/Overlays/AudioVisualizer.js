@@ -16,7 +16,7 @@ const AudioVisualizer = ({searchParams}) => {
         position: "absolute",
         top: top, left,
     }}>
-      <img src="/assets/images/songName.png" height={height}/>
+      <img src="/assets/images/SongName.png" height={height}/>
     </div>
   );
 };

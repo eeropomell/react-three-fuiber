@@ -8,7 +8,7 @@ const OpeningScreen = () => {
   return (
     <div>
       <title>Opening Screen</title>
-        <div>Opener</div>
+        <h1>Opener</h1>
     </div>
   );
 };

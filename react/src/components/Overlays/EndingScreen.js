@@ -8,7 +8,7 @@ const EndingScreen = () => {
   return (
     <div>
       <title>Ending Screen</title>
-        <div>Ending Screen</div>
+        <h1>Ending Screen</h1>
     </div>
   );
 };
