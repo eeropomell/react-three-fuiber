@@ -7,6 +7,7 @@ const OpeningScreen = () => {
 
   return (
     <div>
+      <title>Opening Screen</title>
         <div>Opener</div>
     </div>
   );

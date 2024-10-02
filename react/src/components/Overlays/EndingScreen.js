@@ -7,7 +7,8 @@ const EndingScreen = () => {
 
   return (
     <div>
-        <div>OE</div>
+      <title>Ending Screen</title>
+        <div>Ending Screen</div>
     </div>
   );
 };

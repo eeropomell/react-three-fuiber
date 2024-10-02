@@ -23,6 +23,7 @@ const Timer = () => {
   return (
     <div className='timer-container'>
          <div>
+          <title>Timer</title>
         {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
       </div>
     </div>

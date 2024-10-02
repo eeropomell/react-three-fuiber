@@ -17,6 +17,8 @@ background: "rgba(255,255,100,0)",
 
     }}>
 
+    <title>Project Demos</title>
+
       {/*}  <img style={{position: "absolute", opacity: "1"}} width={1920} height={1080} src="/image2.png"/>*/}
 
 

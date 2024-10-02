@@ -135,6 +135,7 @@ navigator.clipboard.writeText(fullURL)
 
   return (
     <div>
+      <title>ThreeJS Background</title>
       {renderBackground()}
 
       {showUI ? <UI handleCopyURLtoClipboard={handleCopyURLtoClipboard} handleTimerClick={handleTimerClick}/> : null}

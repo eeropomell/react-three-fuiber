@@ -16,6 +16,7 @@ background: "rgba(255,255,100,0)",
 
 
     }}>
+      <title>Interview</title>
 
         {/*<img style={{position: "absolute", opacity: ".2"}} width={1920} height={1080} src="/image.png"/>*/}
 

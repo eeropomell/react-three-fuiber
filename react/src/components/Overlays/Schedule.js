@@ -8,6 +8,8 @@ const Schedule = () => {
     return (
         <div>
 
+            <title>Schedule</title>
+
             <img style={{ position: "absolute", opacity: ".0" }} width={1920} height={1080} src="/schedule.png" />
 
             <div style={{
