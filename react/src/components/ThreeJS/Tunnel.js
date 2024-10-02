@@ -16,7 +16,7 @@ import PresetsMenu from '../UI/PresetsMenu';
 import FPSCounter from '../UI/FPSCounter';
 import io from 'socket.io-client';
 
-
+const socket = io('http://localhost:4000'); // Update the URL if your server runs on a different port
 
 
 const degreesToRadians = degrees => degrees * (Math.PI / 180);
@@ -403,8 +403,6 @@ const Tunnel_ = ({ params, setSceneTime, sceneTime, showUI }) => {
 
       {showUI ? <FPSCounter /> : null}
 
-
-
       <EffectComposer>
         <GammaCorrectionEffect />
         <Bloom
@@ -428,13 +426,43 @@ const Tunnel = forwardRef((props, ref) => {
 
   const [message, setMessage] = useState(''); // General message state
 
-  const [ws, setWs] = useState(null);
-
   useEffect(() => {
     // Create a WebSocket connection
-    const websocket = new WebSocket('ws://localhost:4000');
 
-    // Handle incoming messages
+
+    socket.on("msg_setParams", (msg) => {
+        console.log("MSG",msg);
+
+        if (msg == null) {
+          return;
+        }
+
+        const messageJSON = JSON.parse(msg);
+
+        // Initialize a new object to store the updated params
+        const updatedParams = { ...params };
+  
+        // Iterate over each key in the `params` state
+        for (const key in messageJSON) {
+          if (updatedParams.hasOwnProperty(key)) {
+            // Check if the searchParams contains the key
+  
+            // Parse the value to a number (assuming all values are numbers; adjust if needed)
+  
+            // Update the params with the parsed value
+            updatedParams[key] = {
+              ...updatedParams[key],
+              value: messageJSON[key]
+            };
+  
+          }
+        }
+  
+        // Update the state with the new params
+        setParams(updatedParams);
+    })  
+
+   /* // Handle incoming messages
     websocket.onmessage = (event) => {
       console.log('Message from server:', event.data);
 
@@ -468,14 +496,14 @@ const Tunnel = forwardRef((props, ref) => {
       setParams(updatedParams);
 
 
-    };
+    };*/
   
     // Set the WebSocket instance to state
-    setWs(websocket);
+    
 
     // Clean up the WebSocket connection on component unmount
     return () => {
-      websocket.close();
+      socket.off("msg_setParams");
     };
   }, []);
 
