@@ -5,7 +5,6 @@ This repo contains the source code for the overlays and effects used in Testauss
 
 ## Features / Plan
 
-
 - The parametric URL specifies what background and other elements to display, e.g:
      - `localhost:3000/scene?background=tunnel&foreground=timer&timerText='Stream Starts Soon!'&timerCountDown=100000`
      - `localhost:3000/scene?background=microchip&foreground=credits&creditsText='....'`
