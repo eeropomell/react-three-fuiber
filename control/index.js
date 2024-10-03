@@ -38,15 +38,16 @@ async function launchChromium(url) {
             width: 1920, height: 1080
         }, // Use full size
         args: [
-            "--kiosk", // full screen webpage view
+           // "--kiosk", // full screen webpage view
             '--disable-background-timer-throttling', 
             '--disable-renderer-backgrounding', 
             '--window-position=0,0', 
             '--window-size=1920,1080', 
+            '--app=' + url,
           ]
     });
-    page = await browser.newPage();
-    await page.goto(url); 
+
+    
     console.log("Chromium launched with page: " + url);
     return page;
 }

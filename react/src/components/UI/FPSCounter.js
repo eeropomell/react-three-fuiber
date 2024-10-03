@@ -23,7 +23,7 @@ const FPSCounter = () => {
     <>
     <Html>
     <div style={{ position: 'absolute', top: '10px', left: '10px', color: 'white',fontSize:20 }}>
-      FPS: {fps}
+      
     </div>
     </Html>
     </>

@@ -15,9 +15,88 @@ import ParameterMenu from '../UI/ParameterMenu';
 import PresetsMenu from '../UI/PresetsMenu';
 import FPSCounter from '../UI/FPSCounter';
 import io from 'socket.io-client';
+import { useMemo } from 'react';
 
 const socket = io('http://localhost:4000'); // Update the URL if your server runs on a different port
 
+function easeIn(t) {
+  const A = -0.02;
+  const B = -4;
+  return A + (B - A) * (t*t*t*t*t) // quadratic ease-in
+}
+
+// runs every frame during the outro
+// frame = 0 is the first frame during the outro
+const outroUpdate = (frame,gltf,whiteoutQuad,bloomRef,setBloomIntensity,effectComposerRef,
+  cylinder, time,delta,camera
+) => {
+  console.log("outro update", frame);
+
+  console.log("outro sphere", gltf.scene.getObjectByName("Sphere"))
+
+  console.log("outro BLOOM",bloomRef.current.uniforms.get("intensity").value);
+
+  
+
+//  bloomRef.current.uniforms.set("intensity",{value: 100})
+
+  const x = (frame - 4350)/150;
+
+  const accelerationLength = 4000;
+
+  let gridScroll_ = 0;
+
+  const speedX = 1 - ((accelerationLength - frame) / accelerationLength);
+
+  const speedn_1 = 1 - (1 / accelerationLength);
+  
+  const multiplier = easeIn(speedn_1) - easeIn(1);
+
+  console.log("outro multiplier", multiplier);
+
+  if (frame <= accelerationLength) {
+    console.log("outro easeIn",easeIn(speedX))
+    gridScroll_ = easeIn(speedX);
+
+    const prevFrame = frame - 1;
+    const speedX_2 = 1 - ((accelerationLength - prevFrame) / accelerationLength);
+    console.log("outro slope", easeIn(speedX_2) - easeIn(speedX),
+  "t1", speedX, "t2",speedX_2)
+  
+  } else {
+    gridScroll_ = (easeIn(1) - multiplier*(frame - accelerationLength));
+
+    const prevFrame = frame - 1;
+
+    console.log("outro slope", (easeIn(1) - 0.004*(prevFrame - accelerationLength)) - (easeIn(1) - 0.004*(frame - accelerationLength)))
+  }
+  console.log("outro gridScroll",gridScroll_);
+ 
+  cylinder.material.uniforms.gridScroll.value = gridScroll_;
+
+ // if (frame < 800) {
+ //   cylinder.material.uniforms.gridScroll.value = -.2*time.current;
+    //camera
+  // camera.rotation.z+= .9*delta;
+ //// } else {
+   // cylinder.material.uniforms.gridScroll.value = -.5*time.current;
+ // }
+
+  if (frame === 800) {
+    const realFrame = (frame - 100) / 20;
+    //setBloomIntensity(50);
+
+   // const v = THREE.MathUtils.clamp(Math.pow(2,5*((realFrame)-1))*100+5,5,500)
+    //setBloomIntensity(v);
+    //console.log("outro effect",effectComposerRef,v)
+    //effectComposerRef.current.render(.1);
+   // cylinder.material.uniforms.gridScroll.value = -.5*time.current;
+  }
+ // setBloomIntensity(THREE.MathUtils.clamp(Math.pow(2,20*(x-1))*100+5,5,100));
+
+  whiteoutQuad.material.opacity = THREE.MathUtils.clamp(Math.pow(2,20*(x-1)),0,1);
+  //gltf.cameras[0].setFocalLength(Math.pow(2,2*((100-frame)/100)-1)*20+5);
+}
 
 const degreesToRadians = degrees => degrees * (Math.PI / 180);
 
@@ -35,7 +114,7 @@ const CameraLogger = () => {
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'w' || event.key === 'W') {
-        console.log('Camera Object:', cameraRef.current);
+       // console.log('Camera Object:', cameraRef.current);
       }
     };
 
@@ -51,13 +130,7 @@ const CameraLogger = () => {
   return null;
 };
 
-function TunnelActual({ params, sceneTime, setSceneTime }) {
-  const gltf = useLoader(GLTFLoader, '/assets/models/tunnel6.glb')
-
-  const set = useThree(s => s.set);
-  const get = useThree(s => s.get);
-  const { isPaused } = usePause();
-
+function TunnelActual({ params, sceneTime, setSceneTime}) {
 
 
   const vertexShader = `
@@ -88,6 +161,7 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
       return sin(3.*t+uv.y*20.);
   }
 
+ 
 
   void main() {
     vUv = uv;
@@ -131,6 +205,9 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
     }
     //pos_ += vec3(n5sin,0,n5sin);//step(.2,1. - uv.y);
 
+
+
+
     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos_, 1.0);
     }
 `;
@@ -144,6 +221,7 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
 
   uniform float gridScroll;
   uniform float gridScale;
+  
 
   void main() {
       float scrollSpeed = gridScroll;
@@ -172,11 +250,101 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
 
   `;
 
+  const vertexShader2 = `
+  varying vec2 vUv;
+  uniform float time;
+  uniform float turnFrequency;
+  uniform float turnSpeed;
+  uniform float turnMagnitude;
+  uniform float turnDirection;
 
+  #define M_PI 3.1415926535897932384626433832795
+
+  #define M_TWISTFREQUENCY 3.
+  #define M_TWISTSPEED 2.
+  #define M_TWISTMAGNITUDE 15.
+
+  float f(float t, vec2 uv) {
+      return smoothstep(5.,5.5,(1.-uv.y)*t);
+  }
+
+  float m(float t, vec2 uv) {
+    return sin((1.-uv.y)*t);
+  }
+
+  float g(float t,vec2 uv) {
+      return sin(3.*t+uv.y*20.);
+  }
+
+
+  void main() {
+    vUv = uv;
+    vec3 pos_ = position;
+    if (vUv.y < .2) {
+      pos_ += vec3(10.,0,0);
+    }
+    pos_ = position;
+
+
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos_, 1.0);
+    }
+`;
+
+
+  const fragmentShader2 = `
+  
+  varying vec2 vUv;
+
+  uniform sampler2D tex1;
+  
+
+  void main() {
+
+      // Output to screen
+      gl_FragColor = texture(vec3(.5,.5,.5),1.);
+  
+  }
+
+
+  `;
+
+
+
+  const gltf = useLoader(GLTFLoader, '/assets/models/earthChipCylinder2.gltf')
+ // console.log("GLTF_",gltf);
+
+ 
+
+  const sphere = gltf.scene.getObjectByName("Sphere")
+
+
+  const whiteoutQuad = useMemo(() => {
+
+    return gltf.scene.getObjectByName("Plane");
+  }, )
+
+  const time = useRef(0);
+  
 
   const customShaderMaterial = new ShaderMaterial({
     vertexShader,
     fragmentShader,
+    uniforms: {
+      // Define uniforms here if needed
+      time: { value: time.current },
+      delta: { value: 0.0 },
+      ...Object.keys(params).reduce((acc, key) => {
+        acc[key] = { value: 0.0 };
+        return acc;
+      }, {}),
+
+    },
+
+  });
+
+  const customShaderMaterial2 = new ShaderMaterial({
+    vertexShader2,
+    fragmentShader2,
     uniforms: {
       // Define uniforms here if needed
       time: { value: 0.0 },
@@ -185,88 +353,162 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
         acc[key] = { value: 0.0 };
         return acc;
       }, {}),
+      tex1: {
+        value: new THREE.TextureLoader().load("/assets/images/earthTex.jpeg")
+      }
     },
+
   });
 
+  console.log("sphere",sphere)
+ // sphere.material = customShaderMaterial;
 
-  const cylinderRef = useRef(null);
+
+  whiteoutQuad.material = useMemo(() => new MeshStandardMaterial({
+    emissive: new THREE.Color(0xffffff),
+    emissiveIntensity: 1,
+    color: "white",
+    side: THREE.BackSide,
+    transparent: true,
+    opacity: 0
+   
+  }),[])
+
+    console.log("white",whiteoutQuad.position);
+ // const whiteQuadPos = useMemo(() => whiteoutQuad.position.y)
+
+  //whiteoutQuad.position.y -= .3;
+  whiteoutQuad.position.set(0,1.563736915588379-1.5,0);
+
+
+
+ 
+
+
+  gltf.scene.traverse(child => {
+    if (child.material && child.material.name == "black.006") {
+      child.material.emissiveIntensity = 100;
+    }
+  })
+
+
+  const frameCount = useRef(0);
+  const elapsedTime = useRef(0);
+  const fps = useRef(0);
+
+  const set = useThree(s => s.set);
+  const get = useThree(s => s.get);
+  const { isPaused } = usePause();
+
+  gltf.cameras[0].setFocalLength(15);
+
+  set({ camera: gltf.cameras[0] });
+
+  const cylinder = gltf.scene.getObjectByName("Cylinder002");
+
+  cylinder.material = customShaderMaterial;
+
+  const playingOutro = useRef(false);
+
+
+
+  const globalFrame = useRef(0);
+  const outroFrame = useRef(0);
+
+  const outroTotalFrames = 4500;
+  
+//  const { time, setTime, timeResetFlag, setTimeResetFlag } = usePause();
+
+
+  const timeMemo = useMemo(() => time.current,[time]);
+
+ // console.log("TIMEFFS",time);
 
   useEffect(() => {
-    console.log(gltf.cameras);
+    console.log("TIMEFFS",time);
+  },[time.current])
 
-    const euler = new THREE.Euler(
-      180, // Rotation around X axis
-      -0,   // Rotation around Y axis
-      degreesToRadians(180),   // Rotation around Z axis
-      'XYZ'                  // Rotation order
-    );
+  const startOutro = (frame,outroFrameRef) => {
+   // setPlayingOutro(true);
+ //   setOutroFrame(0);
+ outroFrameRef.current = 0;
+  }
 
-    const quaternion = new THREE.Quaternion().setFromEuler(euler);
+  const endOutro = () => {
+   // setPlayingOutro(false);
+  }
 
-
-    gltf.cameras[0].setFocalLength(15);
-    // gltf.cameras[0].rotation.x = degreesToRadians(180);
-    // gltf.cameras[0].rotation.y = degreesToRadians(-180);
-    gltf.cameras[0].applyQuaternion(quaternion);
-    set({ camera: gltf.cameras[0] });
-
-    const camera2 = get().camera;
-    camera2.applyQuaternion(quaternion);
-
-    const cylinder = gltf.scene.getObjectByName("Cylinder");
-    // console.log("C",cylinder);
-
-    cylinder.material = new MeshStandardMaterial({
-      color: "red",
-      side: THREE.FrontSide
-
-    });
-    cylinder.material = customShaderMaterial;
-
-    cylinder.position.y -= 0.0;
-    console.log("SCALE", cylinder.scale);
-    const scaleMult = 15;
-    const originalScale = cylinder.scale.clone();
-    cylinder.scale.set(cylinder.scale.x * scaleMult, cylinder.scale.y * scaleMult, cylinder.scale.z * scaleMult);
-
-    // Cleanup function
-    return () => {
-      // Dispose of custom shader material
-      if (customShaderMaterial) {
-        customShaderMaterial.dispose();
-      }
-
-      cylinder.scale.set(originalScale.x, originalScale.y, originalScale.z);
-
-      // Dispose of any GLTF resources
-      if (gltf.scene) {
-        gltf.scene.traverse((child) => {
-          if (child.material) {
-            child.material.dispose();
-          }
-          if (child.geometry) {
-            child.geometry.dispose();
-          }
-        });
-      }
-    };
-  }, [gltf.scene, set, customShaderMaterial])
-
-
-  const { time, setTime, timeResetFlag, setTimeResetFlag } = usePause();
-
+  const bloomRef = useRef(null);
+  const [bloomIntensity,setBloomIntensity] = useState(5);
 
   useFrame((state, delta) => {
-    // console.log(customShaderMaterial.uniforms.iTime);
-    console.log("my sceneTime", sceneTime);
 
-    if (!isPaused && !timeResetFlag) {
-      customShaderMaterial.uniforms.time.value = time;
-      setTime(t => t + delta);
-    } else if (timeResetFlag) {
-      setTime(0);
-      setTimeResetFlag(false);
+  
+
+    frameCount.current++;
+    elapsedTime.current += delta;
+
+
+    // Calculate FPS every second
+    if (elapsedTime.current >= 1) {
+      fps.current = frameCount.current / elapsedTime.current;
+
+      // Log or display the FPS
+     //("FPS_:", fps.current);
+
+      // Reset for the next second
+      elapsedTime.current = 0;
+      frameCount.current = 0;
     }
+
+   // sphere.rotation.y += -.3*delta;
+
+
+    // console.log(customShaderMaterial.uniforms.iTime);
+  //  console.log("my sceneTime", sceneTime);
+
+  //gltf.cameras[0].setFocalLength(Math.sin(state.clock.getElapsedTime())*5+10);
+
+  
+
+      console.log("frame", globalFrame.current)
+      const currentGlobalFrame = globalFrame.current + 1; 
+      globalFrame.current++;
+
+      if (currentGlobalFrame < 400) {
+      //  console.log("outro global", globalFrame);
+      //  console.log("outro playing", playingOutro);
+        
+      //  console.log("outro frame", outroFrame);
+  
+      }
+   
+      
+      if (currentGlobalFrame == 100) {
+        playingOutro.current = true;
+      }
+
+      if (playingOutro.current == true) {
+        outroUpdate(outroFrame.current++,gltf,whiteoutQuad,bloomRef,setBloomIntensity,effectComposerRef,
+          cylinder, time,delta,get().camera
+        );
+        if (outroFrame.current >= outroTotalFrames) {
+          playingOutro.current = false;
+        }
+      }
+
+      
+
+ 
+
+    const globFrame = globalFrame;
+
+    if (!isPaused) {
+      time.current += delta;
+      customShaderMaterial.uniforms.time.value += delta;
+    //  setTime(t => t + delta);
+    } 
+
 
 
     // 4+4*smoothstep(0,0.7,sin(x+t))
@@ -275,7 +517,7 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
     const val = .1 * THREE.MathUtils.smoothstep(Math.sin(time * 2), 0, 1);
     // THREE.MathUtils.lerp(0,.001,time);
     // params.gridScroll.value;
-    console.log("Val", val, Math.sin(time), time);
+  //  console.log("Val", val, Math.sin(time), time);
 
     /*
 
@@ -283,29 +525,6 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
     gridScale = 4 + 4*smoothstep(0,0.7,sin(t))
 
     */
-
-    function replaceSinWithMathSin(input) {
-      return input.replace(/sin\(([^)]+)\)/g, 'Math.sin($1)');
-    }
-
-    function formatMathExpr(input) {
-      try {
-        let t1 = input.replace(/sin\(([^)]+)\)/g, 'Math.sin($1)');
-        t1 = t1.replace(/cos\(([^)]+)\)/g, 'Math.cos($1)')
-        t1 = t1.replace(/tan\(([^)]+)\)/g, 'Math.tan($1)')
-        t1 = t1.replace(/random\(([^)]+)\)/g, 'Math.random($1)')
-      } catch (e) {
-        console.error(e);
-      }
-
-    }
-
-    const fnExpr = `
-  
-    return ${params.gridScale.value};
-    `;
-
-
 
 
     const step = (x, limit) => {
@@ -317,7 +536,7 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
     customShaderMaterial.uniforms.turnSpeed.value = params.turnSpeed.value;
     try {
       customShaderMaterial.uniforms.turnSpeed.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
-        ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnSpeed.value}`)(time, time,
+        ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnSpeed.value}`)(time.current, time.current,
           ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
           ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
           step
@@ -328,7 +547,7 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
 
     try {
       customShaderMaterial.uniforms.turnFrequency.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
-        ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnFrequency.value}`)(time, time,
+        ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnFrequency.value}`)(time.current, time.current,
           ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
           ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
           step
@@ -338,7 +557,7 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
     }
     try {
       customShaderMaterial.uniforms.turnMagnitude.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
-        ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnMagnitude.value}`)(time, time,
+        ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.turnMagnitude.value}`)(time.current, time.current,
           ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
           ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
           step
@@ -350,7 +569,7 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
 
     try {
       customShaderMaterial.uniforms.gridScale.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
-        ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.gridScale.value}`)(time, time,
+        ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.gridScale.value}`)(time.current, time.current,
           ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
           ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
           step
@@ -359,15 +578,21 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
       customShaderMaterial.uniforms.gridScale.value = 10;
     }
 
+    const camera3 = get().camera;
+    camera3.position.z = Math.sin(time.current*4)*.1
+
     try {
-      customShaderMaterial.uniforms.gridScroll.value = new Function("t", "time", ...Object.getOwnPropertyNames(Math),
-        ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.gridScroll.value}`)(time, time,
-          ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
-          ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
-          step
-        );
+      if (playingOutro.current == false) {
+            customShaderMaterial.uniforms.gridScroll.value = 
+      new Function("t", "time", ...Object.getOwnPropertyNames(Math),
+      ...Object.getOwnPropertyNames(THREE.MathUtils), "step", `return ${params.gridScroll.value}`)(time.current, time.current,
+        ...Object.getOwnPropertyNames(Math).map(methodName => Math[methodName]),
+        ...Object.getOwnPropertyNames(THREE.MathUtils).map(methodName => THREE.MathUtils[methodName]),
+        step
+      );
+      }
     } catch (e) {
-      customShaderMaterial.uniforms.gridScroll.value = -.2;
+  //   customShaderMaterial.uniforms.gridScroll.value = -.2*time.current;
     }
 
 
@@ -376,7 +601,7 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
     customShaderMaterial.uniforms.delta.value = delta;
 
 
-    console.log("TIME", state.clock.getElapsedTime())
+  //  console.log("TIME", state.clock.getElapsedTime())
     if (matRef.current) {
       //      console.log(matRef.current.material);
       //matRef.current.material.uniforms.iTime = state.clock.getElapsedTime();
@@ -384,11 +609,30 @@ function TunnelActual({ params, sceneTime, setSceneTime }) {
   })
 
   const matRef = useRef();
+  const effectComposerRef = useRef(null);
 
-  return <primitive object={gltf.scene} ref={matRef} />
+  return (
+    <>
+       <EffectComposer ref={effectComposerRef}>
+        <GammaCorrectionEffect />
+        <Bloom
+        ref={bloomRef}
+          mipmapBlur={true}
+          kernelSize={500}
+          luminanceThreshold={.3}
+          luminanceSmoothing={.05}
+          intensity={bloomIntensity}
+        />
+</EffectComposer>
+    <primitive object={gltf.scene} ref={matRef} />
+    </>
+  )
 }
 
 const Tunnel_ = ({ params, setSceneTime, sceneTime, showUI }) => {
+
+
+
 
 
 
@@ -399,23 +643,18 @@ const Tunnel_ = ({ params, setSceneTime, sceneTime, showUI }) => {
     }}>
 
 
-      <TunnelActual params={params} setSceneTime={setSceneTime} sceneTime={sceneTime} />
+    
+    <Suspense>
+    <TunnelActual params={params}/>
+    </Suspense>
+     
 
       {showUI ? <FPSCounter /> : null}
 
-      <EffectComposer>
-        <GammaCorrectionEffect />
-        <Bloom
-          mipmapBlur={true}
-          kernelSize={500}
-          luminanceThreshold={.3}
-          luminanceSmoothing={.05}
-          intensity={5}
-        />
-
+   
         <CameraLogger />
 
-      </EffectComposer>
+ 
     </Canvas>
   )
 }
@@ -431,7 +670,7 @@ const Tunnel = forwardRef((props, ref) => {
 
 
     socket.on("msg_setParams", (msg) => {
-        console.log("MSG",msg);
+        //console.log("MSG",msg);
 
         if (msg == null) {
           return;
@@ -637,8 +876,16 @@ const Tunnel = forwardRef((props, ref) => {
   const [sceneTime, setSceneTime] = useState(1);
 
 
+  const playOutro = () => {
+
+  }
+
+
   return (
     <>
+
+
+ 
 
       {showUI ? <>
         <ParameterMenu params={params} setParams={setParams} sceneTime={sceneTime} setSceneTime={setSceneTime} />
