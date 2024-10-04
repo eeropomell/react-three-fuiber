@@ -21,7 +21,7 @@ const socket = io('http://localhost:4000'); // Update the URL if your server run
 
 function easeIn(t) {
   const A = -0.02;
-  const B = -4;
+  const B = -3;
   return A + (B - A) * (t*t*t*t*t) // quadratic ease-in
 }
 
@@ -36,7 +36,7 @@ const outroUpdate = (frame,gltf,whiteoutQuad,bloomRef,setBloomIntensity,effectCo
 
   console.log("outro BLOOM",bloomRef.current.uniforms.get("intensity").value);
 
-  
+  console.log("outro cam", camera);
 
 //  bloomRef.current.uniforms.set("intensity",{value: 100})
 
@@ -46,6 +46,8 @@ const outroUpdate = (frame,gltf,whiteoutQuad,bloomRef,setBloomIntensity,effectCo
 
   let gridScroll_ = 0;
 
+  //camera.far = Math.sin(frame)*100+100
+
   const speedX = 1 - ((accelerationLength - frame) / accelerationLength);
 
   const speedn_1 = 1 - (1 / accelerationLength);
@@ -53,6 +55,12 @@ const outroUpdate = (frame,gltf,whiteoutQuad,bloomRef,setBloomIntensity,effectCo
   const multiplier = easeIn(speedn_1) - easeIn(1);
 
   console.log("outro multiplier", multiplier);
+
+  if (frame <= 200) {
+    let v = THREE.MathUtils.mapLinear(200 - frame,0,200,100,1000);
+    camera.far = v;
+    camera.updateProjectionMatrix();
+  }
 
   if (frame <= accelerationLength) {
     console.log("outro easeIn",easeIn(speedX))
