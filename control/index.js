@@ -10,7 +10,8 @@ const commands = [
     "launchOverlayWindows",
     "setTimer",
     "setScene",
-    "startOutro"
+    "startOutro",
+    "startIntro"
 ];
 
 const rl = createInterface({
@@ -69,8 +70,12 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Control commands
 async function Control(line) {
+    if (line.length == 0) {
+        return true;
+    }
     const command = line.split(" ")[0]
-    const args = line.split(" ").slice(1)
+    // split by spaces but allow spaces inside "..."
+    const args = line.match(/(?:[^\s"]+|"[^"]*")+/g).slice(1); 
     switch (command) {
         case "launchOverlayWindows": {
             if (args && args.length > 0) {
@@ -98,7 +103,17 @@ async function Control(line) {
         case "setTimer": {
 
             if (timerPage) {
-                await timerPage.goto("http://localhost:3000/overlay/timer?time=" + args[0] + "&text=" + args[1]);
+                let textParam = "";
+                if (args[1] && args[1].length > 0) {
+                    textParam = "&text=" + args[1];
+                }
+                if (args[0] && args[0].length > 0) {
+                    timeParam = "time=" + args[0];
+                } else {
+                    timeParam = "time=" + 10*60; // 10 min by default
+                }
+                console.log("url","http://localhost:3000/overlay/timer?" + timeParam + textParam)
+                await timerPage.goto("http://localhost:3000/overlay/timer?" + timeParam + textParam);
             }
 
             console.log("Timer reset.")
@@ -140,6 +155,14 @@ async function Control(line) {
                 sceneName: "OnlyBackground"
             })
             return true;
+
+        }
+        case "startIntro": {
+            io.emit("startIntro");
+            await socket.call("SetCurrentProgramScene", {
+                sceneName: "OnlyBackground"
+            })
+            return true;
         }
     }
 }
@@ -149,14 +172,6 @@ server.listen(4000, () => {
     rl.setPrompt(">")
 });
 
-; (async () => {
-    socket = new OBSWebSocket()
-    await socket.connect("ws://127.0.0.1:4455")
-    console.log("Connected to OBS")
-
-    rl.prompt()
-})()
-
 rl.on("line", async (line) => {
     if (await Control(line)) {
         rl.prompt()
@@ -165,3 +180,32 @@ rl.on("line", async (line) => {
     console.log("Unknown command.")
     rl.prompt()
 })
+
+const main = async () => {
+
+    socket = new OBSWebSocket()
+    await socket.connect("ws://127.0.0.1:4455")
+    console.log("Connected to OBS")
+    
+    rl.prompt()
+}
+
+
+// to make sure that the program doesn't exit in the case of any errors
+//      as that will close the overlays
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+    console.log("Press any key to restart..");
+
+    // Set up the keypress listener
+    const lineHandler = () => {
+        // Handle the key press
+        rl.removeListener('line',lineHandler); // Remove the listener
+
+        main(); // Restart the main function
+    };
+
+    rl.on('line', lineHandler);
+});
+
+main();
