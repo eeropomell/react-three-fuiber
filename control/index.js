@@ -5,9 +5,21 @@ const http = require('http');
 const { Server } = require('socket.io');
 const puppeteer = require('puppeteer');
 
+
+const commands = [
+    "launchOverlayWindows",
+    "setTimer",
+    "setScene",
+    "startOutro"
+];
+
 const rl = createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
+    completer: (line) => {
+        const hits = commands.filter((cmd) => cmd.startsWith(line));
+        return [hits.length ? hits : commands, line]; 
+    }
 })
 rl.setPrompt("> ")
 
@@ -92,7 +104,6 @@ async function Control(line) {
             console.log("Timer reset.")
             return true
         }
-
         case "setScene": {
 
             const scenes = await socket.call("GetSceneList")
@@ -122,25 +133,13 @@ async function Control(line) {
             rl.setPrompt(">")
             return true
         }
-        case "setFocus": {
-            const currentSettings = await socket.call("GetInputSettings", {
-                inputName: "Focus-view"
+        case "startOutro": {
+
+            io.emit("startOutro");
+            await socket.call("SetCurrentProgramScene", {
+                sceneName: "OnlyBackground"
             })
-            const url = new URL(currentSettings.inputSettings.url)
-            url.searchParams.set("owner", args[0])
-            await socket.call("SetInputSettings", {
-                inputName: "Focus-view",
-                inputSettings: {
-                    url
-                },
-                overlay: true
-            })
-            await socket.call("PressInputPropertiesButton", {
-                inputName: "Focus-view",
-                propertyName: "refreshnocache"
-            })
-            console.log("Focus set.")
-            return true
+            return true;
         }
     }
 }
