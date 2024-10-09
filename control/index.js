@@ -51,6 +51,7 @@ async function launchChromium(url) {
             width: 1920, height: 1080
         }, // Use full size
         args: [
+           
             "--disable-background-timer-throttling",
             "--disable-background-networking-throttling",
             "--disable-background-tab-freeze",
@@ -96,7 +97,7 @@ async function Control(line) {
             await sleep(500)
             await launchChromium("http://localhost:3000/overlay/endingscreen")
             await sleep(500)
-            await launchChromium("http://localhost:3000/scene?background=tunnel")
+            await launchChromium("http://localhost:3000/scene?background=tunnel&preset=1")
             rl.setPrompt(">")
             return true
         }
@@ -131,18 +132,9 @@ async function Control(line) {
                 sceneName: args[0]
             })
 
-            gridScrollDirection *= -1;
-            let message = {
-                gridScroll: gridScrollDirection + "*0.1*t",
-                turnMagnitude: 5
-            }
+     
 
-            message = JSON.stringify(message);
             
-            console.log("Sending {" + message + "}");
-            rl.setPrompt(">")
-
-            io.emit("msg_setParams",message);
 
             console.log(`Scene set to ${args[0]}`)
             rl.setPrompt(">")

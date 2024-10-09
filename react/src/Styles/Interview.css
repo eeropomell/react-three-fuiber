@@ -2,8 +2,34 @@
 
 
 .interview-box {
-    border: 5px solid black;
-    border-radius: 5px;
+    border: 12px solid #2956D5;
+    border-radius: 1px;
     background-color: #D9FFD9;
 }
 
+.interview-container-triangle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #00FFFF;
+}
+
+.interview-container-circle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: #00ffff;
+    clip-path: circle(50%);
+}
+
+.interview-names-text {
+    font-family: 'Poppins';
+font-style: italic;
+font-weight: 600;
+font-size: 30px;
+line-height: 150px;
+
+color: #FFFFFF;
+
+text-shadow: -2px 2px 0.4px #0066FF;
+}

@@ -1,6 +1,8 @@
 body {
   margin: 0;
-  background: green;
+  background-color: green;
+  /** background-image: url('Interview2.png');
+  opacity: .5; **/
 }
 
 .tsry-text {

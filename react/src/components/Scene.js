@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { useRef } from 'react';
 import TestausLiveLogo from './Overlays/TestausLiveLogo';
-import AudioVisualizer from './Overlays/AudioVisualizer';
+
 import Timer from './Overlays/Timer';
 
 const Scene = () => {
@@ -146,9 +146,7 @@ navigator.clipboard.writeText(fullURL)
         "testausLiveLogo_left": "20"
       })}/>
 
-      <AudioVisualizer searchParams={new URLSearchParams({"audioViz_top": "1020", "audioViz_height": "16",
-        "audioViz_left": "1650"
-      })}/>
+
       
 
     </div>

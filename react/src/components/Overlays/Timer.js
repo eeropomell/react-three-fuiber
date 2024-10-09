@@ -9,8 +9,15 @@ const Timer = () => {
   const timeParam = query.get("time") || 10 * 60; // default 10 minutes
   const textParam = query.get("text") || "" // if empty just display the timeParam in center
 
-  const [text,setText] = useState("");
+  const [text,setText] = useState(null);
   const [timeLeft, setTimeLeft] = useState(timeParam);
+
+  function removeEnclosingQuotes(str) {
+    if (str.startsWith('"') && str.endsWith('"')) {
+        return str.slice(1, -1);  // Removes the first and last character
+    }
+    return str;
+}
 
   useEffect(() => {
     // Update the timer every second
@@ -18,7 +25,13 @@ const Timer = () => {
       setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
     }, 1000);
     
-    setText(textParam);
+    console.log("text text",textParam,text,query.get("text"));
+
+    if (!(textParam === "" || !textParam || textParam.trim().length === 0)) {
+      console.log("SETTING text text")
+      setText(removeEnclosingQuotes(textParam))
+    }
+
   
     // Clear the timer on component unmount
     return () => clearInterval(timerId);
