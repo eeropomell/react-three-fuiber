@@ -21,7 +21,9 @@ extend({MeshLineGeometry, MeshLineMaterial})
 const AudioVisualizer = forwardRef((props,ref) => {
 
   const {audioUrl,  blueChipGLTF, intelMaterial,goldMaterial,
-    gltfCam, plane061, visible} = props;
+    gltfCam, plane061} = props;
+
+  const [visible,setVisible] = useState(true);
 
   const stringRef = useRef();
   const [audioData, setAudioData] = useState([]);
@@ -42,6 +44,8 @@ const AudioVisualizer = forwardRef((props,ref) => {
   const groupRef = useRef(null);
 
 
+
+
   useImperativeHandle(ref, () => ({
       setSong_(song) {
         console.log("SETTING INTRO SONG",song);
@@ -54,6 +58,9 @@ const AudioVisualizer = forwardRef((props,ref) => {
       },
       getAudioContext() {
         return audioContext.current;
+      },
+      setVisible_(t) {
+        setVisible(t);
       }
     }));
 
@@ -353,7 +360,11 @@ const AudioVisualizer = forwardRef((props,ref) => {
 
     points.push(1.3,0,0)
 
-    lineRef.current.setPoints(points);
+    if (lineRef.current) {
+      lineRef.current.setPoints(points);
+
+    }
+
 
     //console.log("chunked points",points);
 

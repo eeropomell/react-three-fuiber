@@ -132,7 +132,10 @@ async function Control(line) {
                 sceneName: args[0]
             })
 
-     
+            const msg = JSON.stringify({
+                gridScroll: "10"
+            })
+            io.emit("msg_setParams", msg)
 
             
 

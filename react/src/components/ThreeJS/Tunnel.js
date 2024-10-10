@@ -221,6 +221,17 @@ const TunnelActual = forwardRef((props,ref) => {
     }
   }, [audioVizRef])
 
+
+  const [audioVizVisible, setAudioVizVisible] = useState(true);
+
+  useEffect(() => {
+    if (audioVizVisible) {
+      audioVizContainer.position.set(35.32993087768555, 2.8225765228271484, -20.40278434753418)
+    } else {
+      audioVizContainer.position.set(35.32993087768555 + 1000, 2.8225765228271484, -20.40278434753418)
+    }
+  }, [audioVizVisible])
+
   // Exposing the function to the parent via the ref
   useImperativeHandle(ref, () => ({
       startOutro() {
@@ -228,9 +239,13 @@ const TunnelActual = forwardRef((props,ref) => {
         outroFrame.current = 0;
         if (audioVizRef.current) {
           audioVizRef.current.setSong_({
-            src: "/assets/audio/DarkHorseLogo.mp3", name: "Dark Horse Logo"
+            src: "/assets/audio/darkHorseLouderVolume.mp3", name: "Dark Horse Logo"
           });
           audioVizRef.current.setIsPrestream_(true);
+          setAudioVizVisible(false);
+          audioVizRef.current.setVisible_(false);
+
+
         }
         return;
       },
@@ -246,9 +261,14 @@ const TunnelActual = forwardRef((props,ref) => {
           introStartTime.current = v;
           audioVizRef.current.setIsPrestream_(false);
           audioVizRef.current.setSong_({
-            src: "/assets/audio/DarkHorseLogo.mp3", name: "Dark Horse Logo"
+            src: "/assets/audio/darkHorseLouderVolume.mp3", name: "Dark Horse Logo"
           });
+          audioVizRef.current.setVisible_(false);
+          setAudioVizVisible(false);
+
         }
+        setAudioVizVisible(false);
+
         return;
       }
  
@@ -646,6 +666,8 @@ const plane061_fragmentShader = `
 
   const fbxScene = useFBX("/assets/models/outroScene1.fbx")
 
+  const fbxIntro = useFBX("/assets/models/intro.fbx")
+
 
   const gltfCam = useLoader(GLTFLoader,"/assets/models/camAndAudioVizContainer3.glb")
 
@@ -962,6 +984,8 @@ const plane061_fragmentShader = `
   const audioVizContainerOGposition = new THREE.Vector3(45.23, 20.403, 2.8226);
   
   audioVizContainer.position.set(35.32993087768555, 2.8225765228271484, -20.40278434753418)
+
+
   console.log("AUDIOVIZ",audioVizContainer);
   //audioVizContainer.position.x -= 8;
  // audioVizContainer.position.set(audioVizContainerOGposition.x,audioVizContainerOGposition.y,
@@ -1267,12 +1291,9 @@ const plane061_fragmentShader = `
 
     <primitive object={blueChipGLTF.scene}/>
 
-    <ManyCPUs visible={presetInt == 1}/>
-
-
    <AudioVisualizer blueChipGLTF={blueChipGLTF}
     gltfCam={gltfCam} plane061={plane061}
-    intelMaterial={intelMaterial} goldMaterial={goldMaterial} visible={true}
+    intelMaterial={intelMaterial} goldMaterial={goldMaterial} 
     ref={audioVizRef}
     />
       
