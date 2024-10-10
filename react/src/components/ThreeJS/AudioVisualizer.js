@@ -71,7 +71,18 @@ const AudioVisualizer = forwardRef((props,ref) => {
         src: "/assets/audio/songs/Cyberattack/audio.mp3",
         name: "Cyberattack - Suno AI"
       },
-      // ... up to 10 songs
+      {
+        src: "/assets/audio/songs/RunThroughShadows/audio.mp3",
+        name: "Run Through Shadows - Suno AI"
+      },
+      {
+        src: "/assets/audio/songs/ElectricChase/audio.mp3",
+        name: "Electric Chase - Suno AI"
+      },
+      {
+        src: "/assets/audio/songs/ElectricChase2/audio.mp3",
+        name: "Electric Chase V2 - Suno AI"
+      },
     ];
   
     // One song to loop during the stream
@@ -133,12 +144,18 @@ const AudioVisualizer = forwardRef((props,ref) => {
     audioContext.current = new (window.AudioContext)();
     analyser.current = audioContext.current.createAnalyser();
 
+
+   // audio.current.playbackRate = 4;
     audio.current.onended = handleSongEnded;
-    audio.current.currentTime += 104;
- 
+
+   
     const source = audioContext.current.createMediaElementSource(audio.current);
-    
+
+    //source.playbackRate.value = 2; // Exam
     source.connect(analyser.current);
+
+    
+
     analyser.current.connect(audioContext.current.destination);
     analyser.current.smoothingTimeConstant = .9;
     analyser.current.fftSize = 256; // Size of FFT
@@ -151,8 +168,11 @@ const AudioVisualizer = forwardRef((props,ref) => {
   useEffect(() => {
 
     if (audio.current) {
+      
       audio.current.pause();
+      
       audio.current.src = song.src;
+    
       audio.current.play();
     }
       
