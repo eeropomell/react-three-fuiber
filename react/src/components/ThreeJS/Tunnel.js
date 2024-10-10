@@ -40,12 +40,27 @@ function easeIn(t) {
 
 const introUpdate = (frame, gltf, whiteoutQuad, bloomRef, setBloomIntensity, effectComposerRef,
   cylinder, time, delta, camera,
-  action, mixerRef, tunnelCamGLB, set, chipLogoPlane, fbxLight
+  action, mixerRef, tunnelCamGLB, set, chipLogoPlane, fbxLight,
+  introTime, markersRef,audioVizContainer
 ) => {
   
+  // tweak this until the audio is in sync with the animations
+  const AUDIO_SYSTEM_LATENCY = .1;
+  introTime -= AUDIO_SYSTEM_LATENCY;
 
-  camera.rotation.x += .01;
-
+  if (introTime >= 1.438 && markersRef.current[1] == false) {
+    markersRef.current[1] = true;
+    audioVizContainer.position.x += 1;
+  } else if (introTime >= 2.877 && markersRef.current[0] == false) {
+    markersRef.current[0] = true;
+    audioVizContainer.position.x += 1;
+  } else if (introTime >= 3.382 && markersRef.current[2] == false) {
+    markersRef.current[2] = true;
+    audioVizContainer.position.x += 1;
+  } else if (introTime >= 7.077 && markersRef.current[3] == false) {
+    markersRef.current[3] = true;
+    audioVizContainer.position.x += 1;
+  }
 
 }
 
@@ -55,15 +70,6 @@ const outroUpdate = (frame, gltf, whiteoutQuad, bloomRef, setBloomIntensity, eff
   cylinder, time, delta, camera,
   action, mixerRef, tunnelCamGLB, set, chipLogoPlane, fbxLight
 ) => {
-  //console.log("outro update", frame);
-
- // console.log("outro sphere", gltf.scene.getObjectByName("Sphere"))
-
-  //console.log("outro BLOOM", bloomRef.current.uniforms.get("intensity").value);
-
-  //console.log("outro cam", camera);
-
-  //  bloomRef.current.uniforms.set("intensity",{value: 100})
 
   const x = (frame - 1950) / 50;
 
@@ -207,6 +213,13 @@ const TunnelActual = forwardRef((props,ref) => {
   const presetInt = parseInt(props.presetInt) || 0;
 
   const audioVizRef = useRef(null);
+  const audioContextRef = useRef(null);
+
+  useEffect(() => {
+    if (audioVizRef.current) {
+      audioContextRef.current = audioVizRef.current.getAudioContext();
+    }
+  }, [audioVizRef])
 
   // Exposing the function to the parent via the ref
   useImperativeHandle(ref, () => ({
@@ -225,12 +238,16 @@ const TunnelActual = forwardRef((props,ref) => {
         console.log("START INTRO",audioVizRef);
         playingIntro.current = true;
         introFrame.current = true;
+      
         if (audioVizRef.current) {
+     
+          const v = audioVizRef.current.getAudioContext().currentTime;
+          console.log("START INTRO TIME",v)
+          introStartTime.current = v;
           audioVizRef.current.setIsPrestream_(false);
           audioVizRef.current.setSong_({
             src: "/assets/audio/DarkHorseLogo.mp3", name: "Dark Horse Logo"
           });
-       
         }
         return;
       }
@@ -669,22 +686,7 @@ const plane061_fragmentShader = `
       goldMaterial.current.transparent = true;
     } else if (obj.material && obj.material.name == "Intel") {
       intelMaterial.current = obj.material;
-     
-   /*   console.log("INTEL",obj, obj.localToWorld(obj.position));
-
-// Step 1: Get the forward direction of object1 (negative Z-axis)
-const forwardDirection = new THREE.Vector3();
-obj.getWorldDirection(forwardDirection); // This gets the normalized forward direction in world space
-
-
-      // Step 2: Get the right direction of object1 (positive X-axis)
-// The right vector can be derived by taking the cross product of the object's up and forward vectors
-const rightDirection = new THREE.Vector3();
-rightDirection.crossVectors(obj.up, forwardDirection).normalize(); // Cross product of up and forward
-
-
-      const pos = (new THREE.Vector3(...obj.position)).add(new THREE.Vector3(rightDirection.x*10,rightDirection.y*10,obj.up.z*10));
-      console.log("intel pos",pos, obj.localToWorld(pos));*/
+    
     }
     return obj;
   })
@@ -800,6 +802,8 @@ rightDirection.crossVectors(obj.up, forwardDirection).normalize(); // Cross prod
  useEffect(() => {
  // plane061.position.x -= 2;
   //plane061.position.y += 2;
+
+  
  }, [])
 
 
@@ -910,6 +914,14 @@ rightDirection.crossVectors(obj.up, forwardDirection).normalize(); // Cross prod
   const outroFrame = useRef(0);
 
   const introFrame = useRef(0);
+  const introStartTime = useRef(0);
+
+  const markersRef = useRef([
+    false,false,false,false,false,false
+  ]);
+
+  // prev audioContext.currentTime (last frame during intro update)
+  const prevIntroTime = useRef(-1);
 
   const outroTotalFrames = 2000;
   const introTotalFrames = 1500;
@@ -964,6 +976,7 @@ rightDirection.crossVectors(obj.up, forwardDirection).normalize(); // Cross prod
 
    // console.log(state.get().camera,"currcam")
 
+
   
   //  console.log("REL",gltfCam.cameras[0].localToWorld(gltfCam.cameras[0].position))
    // console.log('rel',gltfCam.cameras[0].worldToLocal(audioVizContainer.localToWorld(audioVizContainer.position)))
@@ -984,7 +997,6 @@ rightDirection.crossVectors(obj.up, forwardDirection).normalize(); // Cross prod
 
     frameCount.current++;
     elapsedTime.current += delta;
-
 
 
     // Calculate FPS every second
@@ -1054,19 +1066,27 @@ rightDirection.crossVectors(obj.up, forwardDirection).normalize(); // Cross prod
 
       }
     } else if (playingIntro.current == true) {
-       introUpdate(introFrame.current++, gltf, whiteoutQuad, bloomRef, setBloomIntensity, effectComposerRef,
-        cylinder, time, delta, get().camera, action, mixerRef,
-        tunnelCamGLB, set, chipLogoPlane,fbxLight)
+      let introTime;
+     
+      if (audioContextRef.current && introStartTime.current) {
+        introTime = audioContextRef.current.currentTime - introStartTime.current - (audioContextRef.current.baseLatency +audioContextRef.current.outputLatency);
+      }
+      console.log("INTRO TIME CURRENT",introTime,audioContextRef,introStartTime);
 
-        
-
-      if (introFrame.current >= introTotalFrames) {
-        
+      if (introTime > 14.2) {
         endIntro();
         introFrame.current = 0;
         playingIntro.current = false;
 
+      } else {
+       introUpdate(introFrame.current++, gltf, whiteoutQuad, bloomRef, setBloomIntensity, effectComposerRef,
+          cylinder, time, delta, get().camera, action, mixerRef,
+          tunnelCamGLB, set, chipLogoPlane,fbxLight, introTime,markersRef, audioVizContainer)
+
       }
+  
+
+    
     }
 
 
@@ -1183,6 +1203,12 @@ rightDirection.crossVectors(obj.up, forwardDirection).normalize(); // Cross prod
     if (matRef.current) {
       //      console.log(matRef.current.material);
       //matRef.current.material.uniforms.iTime = state.clock.getElapsedTime();
+    }
+
+
+    if (audioVizRef.current) {
+      const audioContext_ = audioVizRef.current.getAudioContext();
+      console.log("INTRO AUDIOCONTEXT",audioContext_);
     }
   })
 

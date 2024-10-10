@@ -51,6 +51,9 @@ const AudioVisualizer = forwardRef((props,ref) => {
         console.log("SETTING PRESTREAM",t,isPreStream);
         setIsPreStream(t);
         isPreStreamRef.current = t;
+      },
+      getAudioContext() {
+        return audioContext.current;
       }
     }));
 
